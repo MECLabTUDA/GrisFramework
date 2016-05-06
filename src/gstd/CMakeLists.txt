@@ -22,6 +22,7 @@ set(Includes
 	${INC_DIR}DynamicProperty.h
 	${INC_DIR}DynamicPropertyManager.h
 	${INC_DIR}logger.h
+	${INC_DIR}GrisFileLogger.h
 	${INC_DIR}gstd_api.h
 	)
 set(Private_Includes
@@ -33,6 +34,7 @@ set(Private_Includes
 set(Sources
 	dynamicPropertyManager.cpp
 	logger.cpp
+	GrisFileLogger.cpp
 	XmlDocument.cpp
 	XmlNode.cpp
 	XmlAttribute.cpp
