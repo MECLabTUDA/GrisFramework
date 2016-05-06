@@ -1,0 +1,181 @@
+#include "private/gris.pch"
+#include "XmlNode.h"
+
+#include <pugixml.hpp>
+
+#include <boost/filesystem.hpp>
+
+#include <iostream>
+
+
+using namespace std;
+using namespace boost::filesystem;
+
+namespace gris
+{
+
+  struct XmlNode::Impl
+  {
+    Impl() {}
+    ~Impl() {}
+
+    pugi::xml_node node;
+    std::string    name;
+  };
+
+  XmlNode::XmlNode()
+    : mp(std::make_unique<Impl>())
+  {
+  }
+
+  XmlNode::XmlNode(const XmlNode& o)
+    : mp(std::make_unique<Impl>())
+  {
+    mp->node = o.mp->node;
+    mp->name = o.mp->name;
+  }
+
+  XmlNode::~XmlNode()
+  {
+  }
+
+  XmlNode::XmlNode(pugi::xml_node* node)
+    : mp(std::make_unique<Impl>())
+  {
+    if (nullptr!=node)
+    {
+      mp->node = *node;
+      mp->name = node->name();
+    }
+  }
+
+  XmlNode& XmlNode::operator=(const XmlNode& o)
+  {
+    if (this!=&o)
+    {
+      mp->node = o.mp->node;
+      mp->name = o.mp->name;
+    }
+    return *this;
+  }
+
+  /**
+  */
+  void XmlNode::setRoot(pugi::xml_node& root)
+  {
+    mp->node = root;
+    mp->name = root.name();
+  }
+
+  /**
+  */
+  pugi::xml_node* XmlNode::getNode()
+  {
+    return &(mp->node);
+  }
+
+  /**
+  */
+  std::vector<XmlNode> XmlNode::getChildren() const
+  {
+    std::vector<XmlNode> result;
+    auto children = mp->node.children();
+    for (auto iter = children.begin(); iter!=children.end(); ++iter)
+    {
+      auto node = XmlNode(&(*iter));
+      result.push_back(node);
+    }
+    return result;
+  }
+
+  /**
+  */
+  XmlNode XmlNode::getChild(const char* name) const
+  {
+    XmlNode node;
+    node.mp->node = mp->node.child(name);
+    if (node.mp->node.empty())
+    {
+      std::cout << *this << endl;
+      throw XmlException(XmlException::ChildNotFound);
+    }
+    return node;
+  }
+
+
+  /**
+  */
+  XmlAttribute XmlNode::getAttribute(const char* name) const
+  {
+    XmlAttribute res(&mp->node.attribute(name));
+    if (res.mAtt->empty())
+      throw XmlException(XmlException::AttributeNotFound);
+    return res;
+  }
+
+  /**
+  */
+  void XmlNode::addChild(const XmlNode& node)
+  {
+    mp->node.append_copy(node.mp->node);
+  }
+
+  /**
+  */
+  XmlNode XmlNode::addChild(const char* name)
+  {
+    XmlNode res;
+    res.mp->node = mp->node.append_child(name);
+    return res;
+  }
+
+  /**
+  */
+  void XmlNode::setValue(const char* val)
+  {
+    mp->node.set_value(val);
+    mp->node.append_child(pugi::node_pcdata).set_value(val);
+  }
+
+  /**
+  */
+  const char* XmlNode::getValue() const
+  {    
+    return mp->node.child_value();
+  }
+  
+  /**
+  */
+  void XmlNode::addAttribute(const char* name, const char* value)
+  {    
+    pugi::xml_attribute att;
+    att.set_name(name);
+    att.set_value(value);
+    mp->node.append_copy(att);
+    //mp->node.append_attribute(att);
+  }
+
+  /**
+  */
+  XmlAttribute XmlNode::addAttribute(const char* name)
+  {    
+    pugi::xml_attribute att = mp->node.append_attribute(name);
+    return XmlAttribute (&att);    
+  }
+
+  /**
+  */
+  ostream& XmlNode::print(ostream& os) const
+  {
+    os << "Node " << mp->name;
+    return os;
+  }
+
+  /**
+  */
+  std::ostream& operator<<(std::ostream& os, const XmlNode& node)
+  {
+    return node.print(os);
+  }
+
+}
