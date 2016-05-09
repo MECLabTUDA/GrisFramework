@@ -4,14 +4,14 @@
 namespace gris
 {
   GrisFileLogger::GrisFileLogger(const char* filename)
-    : std::ostream(this)
-    , ofs(filename)
+    : std::ostream(this)    
   {      
+    ofs.open( filename, std::ios_base::app);
   }
 
   GrisFileLogger::~GrisFileLogger() 
   {
-    ofs.close(); 
+    ofs.close();
   }
 
   int GrisFileLogger::overflow(int c)
