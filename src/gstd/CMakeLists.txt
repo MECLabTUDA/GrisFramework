@@ -22,41 +22,45 @@ set(Includes
 	${INC_DIR}DynamicProperty.h
 	${INC_DIR}DynamicPropertyManager.h
 	${INC_DIR}logger.h
+	${INC_DIR}GrisFileLogger.h
 	${INC_DIR}gstd_api.h
 	)
 set(Private_Includes
 	${INC_DIR}private/gris.pch
-	${INC_DIR}private/resource.h
-	${INC_DIR}private/targetver.h	
-	)
-	
+	${INC_DIR}private/targetver.h
+	)	
 set(Sources
 	dynamicPropertyManager.cpp
 	logger.cpp
+	GrisFileLogger.cpp
 	XmlDocument.cpp
 	XmlNode.cpp
 	XmlAttribute.cpp
+	)
+set(Resources
+	${INC_DIR}resource/resource.rc
 	)	
-	
-#set(Precompiled_Sources "")
-	
+
+#set(Precompiled_Sources "")	
 #add_msvc_precompiled_header("muk_common.pch" "muk_common.cpp" ${Sources} )
 
-add_library(gstd SHARED 
-	${Sources}
+add_library(gstd SHARED
 	${Includes}
 	${Private_Includes}
+	${Sources}
+	${Resources}
 	)
 	
-target_link_libraries(
-	gstd
-	#xerces-c_3
+target_link_libraries( gstd	
 	pugixml
 	${BOOST_FILESYSTEM_R}
 	)
 	
 source_group("Header Files\\private" FILES
 	${Private_Includes}
+	)
+source_group("Resources" FILES
+	${Resources}
 	)
 
 install(TARGETS gstd DESTINATION ${CMAKE_INSTALL_PREFIX}/gstd/

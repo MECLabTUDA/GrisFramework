@@ -5,101 +5,85 @@
 
 #include <loki/Singleton.h>
 
-#include <time.h>
-#include <iostream>
-#include <fstream>
+#include <ostream>
 #include <sstream>
-
+#include <fstream>
+#include <vector>
+#include <memory>
 
 namespace gris
 {
-  
-  
-  class GRIS_GSTD_API FileLogger
+  class GRIS_GSTD_API LoggerCallback
   {
     public:
-      FileLogger() : m_logger(std::cout) { init("log.txt"); }
-      explicit FileLogger(const std::string& logFilename) : m_logger(std::cout)
-      {
-        init(logFilename);
-      }
-      ~FileLogger() 
-      {
-        print( "==================================================" );
-        flush();
-        print( "================== Log Finished ==================" );
-        flush();
-        print( "==================================================" );
-        flush();
-        print( "" );
-        flush();
-        print( "" );
-        flush();
-        print( "" );
-        flush();
-        m_fs.close(); 
-      }
+    LoggerCallback() {};
+    virtual ~LoggerCallback() {};
 
-      FileLogger& operator<< (const std::string& s)
-      {         
-        print(s);
-        return *this; 
-      }
+    virtual void stream(const char*) = 0;
+  };
 
-      FileLogger& operator=(FileLogger& fl)
+  class GRIS_GSTD_API Logger
+  {
+    public:
+      Logger();
+      ~Logger();
+
+    public:
+      void init();
+            
+    public:
+      typedef std::ostream& (*Function_Pointer_Manipulator)(std::ostream&);
+
+      Logger& operator<<(Logger&);
+      Logger& operator<<(const char* str);
+      Logger& operator<<(const std::string& str);
+      
+      Logger& operator<<(Function_Pointer_Manipulator manip)
       {
-        fl.flush();
+        mBuffer << manip;
         return *this;
       }
-      
-      void flush()
-      {        
-        time_t      now;
-        struct tm * info;
-        time(&now);
-        info = localtime(&now);
-        char buffer[23];
-        strftime(buffer,23,"%F %X : ",info);
-        m_fs     << buffer << m_ss.str() << "\n";
-        m_logger << buffer << m_ss.str() << "\n";
-        m_ss.str(std::string());
+
+      template<typename T>
+      Logger& operator<<(const T& str)
+      {
+        mBuffer << str;
+        return *this;
       }
 
+      Logger& operator=(Logger& l);
+
+    public:
+      Logger& printTimeStamp();
 
     private:
-      void init(const std::string& logFilename)
-      {
-        m_fs.open(logFilename.c_str(), std::fstream::app);
-        print( "" );
-        flush();
-        print( "" );
-        flush();
-        print( "" );
-        flush();
-        print( "==================================================" );
-        flush();
-        print( "================== New Log =======================" );
-        flush();
-        print( "==================================================" );
-        flush();
-        print( "" );      
-        flush();
-      }
+      void flush();
+              
+    public:
+      //void add_ostream(std::shared_ptr<std::ostream> pOut);
+      //void remove_ostream(std::shared_ptr<std::ostream> pOut);
+      void addStream(std::ostream* pOut);
+      void removeStream(std::ostream* pOut);
 
-      void print(const std::string& text)
-      {
-        m_ss << text.c_str();
-      }
+      void addCallback(LoggerCallback* cb);
+      void removeCallback(LoggerCallback* cb);
 
-    private:      
-      std::stringstream m_ss;
-      std::ostream&  m_logger;
-      std::ofstream  m_fs;
+    private:
+      //std::vector<std::shared_ptr<std::ostream>> mpStreams;
+      std::vector<std::ostream*> mpStreams;
+      std::vector<LoggerCallback*> mpCallbacks;
+      std::ofstream mOfs;
+      std::stringstream mBuffer;
   };
-    
-  typedef Loki::SingletonHolder<FileLogger> DefaultLogger;
 
-  #define LOG_INFO TheLogger::Instance() = TheLogger::Instance()
+  GRIS_GSTD_API Logger& GetGrisLogger();
+  
+  #define LOG       gris::GetGrisLogger()
+  #define LOG_LINE  gris::GetGrisLogger() = LOG
+  #define TLOG      gris::GetGrisLogger().printTimeStamp() << ": "
+  #define TLOG_LINE gris::GetGrisLogger() = TLOG
+  #define THE_GRIS_LOGGER gris::GetGrisLogger()
+  
 }
 
 
