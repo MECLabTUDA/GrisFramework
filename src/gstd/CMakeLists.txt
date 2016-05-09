@@ -38,7 +38,7 @@ set(Sources
 	XmlAttribute.cpp
 	)
 set(Resources
-	${INC_DIR}resource/resource.rc
+	resource.rc
 	)	
 
 #set(Precompiled_Sources "")	
