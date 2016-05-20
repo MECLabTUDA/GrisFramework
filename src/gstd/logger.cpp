@@ -58,10 +58,7 @@ namespace gris
   */
   void Logger::init()
   {
-    //mpStreams.push_back(std::make_shared<DummyCout>());
-    //mpStreams.push_back(std::make_shared<gris::GrisFileLogger>("log.txt"));
-    mOfs.open("log.txt", std::ios_base::trunc);
-    mOfs << "test";
+    mOfs.open("log/log.txt", std::ios_base::trunc);
     mOfs.close();
     printTimeStamp(); *this << ": -----------------------------------------------------\n";
     printTimeStamp(); *this << ": ------------------- New Log Started -----------------\n";
@@ -74,19 +71,11 @@ namespace gris
   Logger& Logger::operator<<(const char* str)
   {
     mBuffer << str;
-    /*for (auto& pOut : mpStreams)
-    {
-      *pOut << str;
-    }*/
     return *this;
   }
 
   Logger& Logger::operator<<(const std::string& str)
   {
-    /*for (auto& pOut : mpStreams)
-    {
-      *pOut << str.c_str();
-    }*/
     mBuffer << str;
     return *this;
   }
@@ -98,20 +87,7 @@ namespace gris
     flush();
     return *this;
   }
-    
-  /*void Logger::add_ostream(std::shared_ptr<std::ostream> pOut)
-  {
-    mpStreams.push_back(pOut);
-  }
-
-  void Logger::remove_ostream(std::shared_ptr<std::ostream> pOut)
-  {
-    auto iter = std::find(mpStreams.begin(), mpStreams.end(), pOut);
-    if (iter!=mpStreams.end())
-      *this << "ostream removed\n";
-    mpStreams.erase(iter);
-  }*/
-
+  
   void Logger::addStream(std::ostream* pOut)
   {
     mpStreams.push_back(pOut);

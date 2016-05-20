@@ -1,79 +1,104 @@
 #ifndef GRIS_DYNAMIC_PROPERTY_H
 #define GRIS_DYNAMIC_PROPERTY_H
 
-//#include "private/std_api.h"
+#include "gstd_api.h"
 
 #include <string>
 #include <map>
 #include <iostream>
 #include <memory>
+#include <vector>
+#include <sstream>
 
 
 namespace gris {
 	namespace gstd  // gris std
 	{
 
-    class BaseProperty
+    class IProperty
     {
       public:
-        virtual ~BaseProperty()
-        {
-        }
-        
-        virtual std::ostream& get(std::ostream&) = 0;
-        virtual void          set(std::istream&) = 0;
+        IProperty() {}
+        virtual ~IProperty() {}
+
+      public:
+        virtual std::ostream& operator<<(std::ostream& os) = 0;
+        virtual void          operator>>(std::istream& is) = 0;
     };
 
+
     template<typename T>
-    class Property : public BaseProperty
+    class Property : public IProperty
     {
       friend class DynamicPropertyManager;
 
-      public:
-        virtual ~Property()
-        {
-        }
-
-        Property(T& d) : data(d)
-        {
-        }
-
-        T& getData() { return data; }
+      public:        
+        explicit Property(T& d) : data(d) {}               
                 
-        virtual std::ostream& get(std::ostream& os) override
+        virtual std::ostream& operator<<(std::ostream& os) override
         {
           return os << data;
         }
 
-        virtual void set(std::istream& s) override
+        virtual void operator>>(std::istream& is) override
         {
-          s >> data;
+          is >> data;
         }
-
 
       private:
         T& data;
     };
 
-    class DynamicProperty
+    class GRIS_GSTD_API DynamicProperty
     {
       friend class DynamicPropertyManager;
 
       public:
+          DynamicProperty() {}
+          ~DynamicProperty() {}
+          DynamicProperty(const DynamicProperty&);
+          DynamicProperty(const DynamicProperty&&);
+          DynamicProperty operator=(const DynamicProperty&);
+
+      public:
         template<typename T>
-        void append(const std::string& tag, T& data)
+        void append(const char* tag, T& data)
         {
-          std::shared_ptr<BaseProperty> pProp (new Property<T>(data));        
-          props.insert(propsType_t::value_type(tag, pProp));
+          std::pair<std::string, std::unique_ptr<IProperty>> pair
+            = std::make_pair(tag, std::make_unique<Property<T>>(data));          
+          mProperties.insert(std::move(pair));
         }
-        
+
+        void get(const char* name, std::ostream& os)
+        {
+          auto iter = mProperties.find(name);
+          if ( mProperties.end() == iter )
+          {
+            throw std::exception("no such key");
+          }
+          *(iter->second.get()) << os;
+        }
+
+        void set(const char* name, const char* val)
+        {
+          auto iter = mProperties.find(name);
+          if ( mProperties.end() == iter )
+          {
+            throw std::exception("no such key");
+          }
+          std::istringstream is(val);
+          *(iter->second.get()) >> is;
+        }
+                
       private:
-        typedef std::map<const std::string, std::shared_ptr<BaseProperty>> propsType_t;
-        propsType_t props;
+        typedef std::map<std::string, std::unique_ptr<IProperty>> PropertyMap;
+        PropertyMap mProperties;
     };
-    
+
+
 	}
 }
 
+#include "dynamicPropertyTemplates.hxx"
 
 #endif

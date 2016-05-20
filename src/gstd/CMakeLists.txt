@@ -16,11 +16,13 @@ set(INC_DIR
 	${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/)
 
 set(Includes
+	${INC_DIR}Vector.h
 	${INC_DIR}XmlDocument.h
 	${INC_DIR}XmlNode.h
 	${INC_DIR}XmlAttribute.h
 	${INC_DIR}DynamicProperty.h
 	${INC_DIR}DynamicPropertyManager.h
+	${INC_DIR}DynamicPropertyTemplates.hxx
 	${INC_DIR}logger.h
 	${INC_DIR}GrisFileLogger.h
 	${INC_DIR}gstd_api.h
@@ -29,8 +31,10 @@ set(Private_Includes
 	${INC_DIR}private/gris.pch
 	${INC_DIR}private/targetver.h
 	)	
-set(Sources
+set(Sources	
+	dynamicProperty.cpp
 	dynamicPropertyManager.cpp
+	#DynamicPropertyTemplates.cpp
 	logger.cpp
 	GrisFileLogger.cpp
 	XmlDocument.cpp

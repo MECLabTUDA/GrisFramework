@@ -13,7 +13,8 @@
 namespace gris {
   namespace gstd  // gris std
   {   
-
+    /**
+    */
     class GRIS_GSTD_API DynamicPropertyManager
     {
       public:

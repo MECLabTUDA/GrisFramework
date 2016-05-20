@@ -3,6 +3,7 @@
 #include "dynamicPropertyManager.h"
 
 #include <iostream>
+#include <sstream>
 
 using namespace gris::gstd;
 
@@ -11,9 +12,9 @@ void DynamicPropertyManager::connectClass(const std::string& classname, DynamicP
 {
   std::cout << "DynamicPropertyManager:  " << "classname" << std::endl;
 
-  for (auto prop : object.props)
+  for (auto& prop : object.mProperties)
   {
-    prop.second->get( std::cout << "DynamicPropertyManager:  " << prop.first << " ") << std::endl;
+    std::cout << "DynamicPropertyManager:  " << prop.first << ": " << prop.second.get() << std::endl;
   }
 }
 
