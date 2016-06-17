@@ -40,13 +40,11 @@ set(Sources
 	XmlDocument.cpp
 	XmlNode.cpp
 	XmlAttribute.cpp
+	Vector.cpp
 	)
 set(Resources
 	resource.rc
 	)	
-
-#set(Precompiled_Sources "")	
-#add_msvc_precompiled_header("muk_common.pch" "muk_common.cpp" ${Sources} )
 
 add_library(gstd SHARED
 	${Includes}
@@ -67,6 +65,12 @@ source_group("Resources" FILES
 	${Resources}
 	)
 
-install(TARGETS gstd DESTINATION ${CMAKE_INSTALL_PREFIX}/gstd/
+install(TARGETS gstd LIBRARY ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
     )
+install(TARGETS gstd RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+    )
+install(DIRECTORY ${INC_DIR} DESTINATION include/gstd
+		 FILES_MATCHING PATTERN "*.h"
+		 )
+		 
 	
