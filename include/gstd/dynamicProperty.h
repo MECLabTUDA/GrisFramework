@@ -58,7 +58,10 @@ namespace gris {
           ~DynamicProperty() {}
           DynamicProperty(const DynamicProperty&);
           DynamicProperty(const DynamicProperty&&);
-          DynamicProperty operator=(const DynamicProperty&);
+          DynamicProperty& operator=(const DynamicProperty&);
+
+      public:
+        void swap(DynamicProperty& o);
 
       public:
         template<typename T>
@@ -69,26 +72,11 @@ namespace gris {
           mProperties.insert(std::move(pair));
         }
 
-        void get(const char* name, std::ostream& os)
-        {
-          auto iter = mProperties.find(name);
-          if ( mProperties.end() == iter )
-          {
-            throw std::exception("no such key");
-          }
-          *(iter->second.get()) << os;
-        }
+        std::vector<const char*> getProperties() const;
 
-        void set(const char* name, const char* val)
-        {
-          auto iter = mProperties.find(name);
-          if ( mProperties.end() == iter )
-          {
-            throw std::exception("no such key");
-          }
-          std::istringstream is(val);
-          *(iter->second.get()) >> is;
-        }
+        void get(const char* name, std::ostream& os) const;
+        void set(const char* name, const char* val);
+        
                 
       private:
         typedef std::map<std::string, std::unique_ptr<IProperty>> PropertyMap;

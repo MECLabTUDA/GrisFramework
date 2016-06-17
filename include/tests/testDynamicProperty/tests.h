@@ -7,4 +7,7 @@ namespace gris
   void testDouble();
   void testBool();
   void testVec3d();
+  void testKeys();
+  void testBadKey();
+  void testInvalidChar();
 }

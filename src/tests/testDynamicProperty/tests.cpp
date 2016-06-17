@@ -66,24 +66,86 @@ namespace gris
   
   void testVec3d()
   {
+    TestClass t;
+    const char* name = "double vector";
+    std::cout << "testing variable '" << name << "'" << endl;
+    {      
+      std::ostringstream os;
+      t.get(name, os);
+      std::cout << name << ": " << os.str() << std::endl;
+      BOOST_CHECK_EQUAL(os.str(), "0 0 0");
+
+      const char* values = "1.5 2.005 -20.11";
+      t.set(name, values);
+      os.str("");
+      t.get(name, os);
+      std::cout << name << ": " << os.str() << std::endl;
+      BOOST_CHECK_EQUAL(os.str(), values);
+    }
+    std::cout << endl;
+  }
+
+  void testKeys()
+  {
+    try
     {
       TestClass t;
-      const char* name = "double vector";
-      std::cout << "testing variable '" << name << "'" << endl;
-      {      
-        std::ostringstream os;
-        t.get(name, os);
-        std::cout << name << ": " << os.str() << std::endl;
-        BOOST_CHECK_EQUAL(os.str(), "0 0 0");
+      auto keysIst  = t.getProperties();
+      std::vector<const char*> keysSoll = {"x", "valid", "double vector" };
+      if (keysIst.size() != keysSoll.size())
+        throw std::exception("Error: Sizes of key-vectors are not equal!");
+      for (size_t i(0); i<keysIst.size(); ++i)
+      {
+        BOOST_CHECK_EQUAL(true, keysSoll.end() != std::find_if(keysSoll.begin(), keysSoll.end(), [&] (const auto& obj) { return std::strcmp(keysIst[i], obj); }));
+      }      
+    }
+    catch (std::exception& e)
+    {
+      std::cout << e.what() << endl;
+      throw e;
+    }    
+  }
 
-        const char* values = "1.5 2.005 -20.11";
-        t.set(name, values);
-        os.str("");
-        t.get(name, os);
-        std::cout << name << ": " << os.str() << std::endl;
-        BOOST_CHECK_EQUAL(os.str(), values);
-      }
-      std::cout << endl;
+  /**
+  */
+  void testBadKey()
+  {
+    try
+    {
+      TestClass t;
+      const char* name = "badKey";
+      std::ostringstream os;
+      t.get(name, os);      
+    }
+    catch (std::exception& e)
+    {      
+      BOOST_CHECK( 0==strcmp(e.what(), "no such key") );
+      throw e;
     }
   }
+
+  const char* badCall()
+  {
+    std::string tmp = "badKey";
+    return tmp.c_str();
+  }
+
+  /**
+  */
+  void testInvalidChar()
+  {
+    try
+    {
+      TestClass t;
+      const char* name = badCall();
+      std::ostringstream os;
+      t.get(name, os);
+    }
+    catch (std::exception& e)
+    {
+      BOOST_CHECK( 0==strcmp(e.what(), "no such key") );
+      throw e;
+    }
+  }
+
 }
