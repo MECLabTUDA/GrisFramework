@@ -30,9 +30,11 @@ namespace gris
 
     Vec3d Vec3d::operator=(const Vec3d& o)
     {
-      if (&o==this)
-        return *this;
-      std::copy(o.data, o.data+3, data);
+      if (&o!=this)
+      {
+        std::copy(o.data, o.data+3, data);
+      }
+      return *this;
     }
 
 
