@@ -139,6 +139,23 @@ namespace gris
 
   /**
   */
+  void XmlNode::setName(const char* val)
+  {
+    if (mp->node.set_name(val))
+    {
+      mp->name = val;
+    }
+  }
+  
+  /**
+  */
+  const char* XmlNode::getName() const
+  {
+    return mp->name.c_str();
+  }
+
+  /**
+  */
   const char* XmlNode::getValue() const
   {    
     return mp->node.child_value();
