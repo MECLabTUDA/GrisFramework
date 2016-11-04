@@ -72,6 +72,8 @@ namespace gris {
           mProperties.insert(std::move(pair));
         }
 
+        void append(const char* tag, DynamicProperty& data);
+
         std::vector<const char*> getProperties() const;
 
         void get(const char* name, std::ostream& os) const;

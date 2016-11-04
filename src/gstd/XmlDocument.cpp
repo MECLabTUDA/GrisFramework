@@ -43,7 +43,7 @@ namespace gris
       throw XmlException(XmlException::FileNotFound);
     auto res = std::make_unique<XmlDocument>();
     pugi::xml_parse_result result = res->mp->doc.load_file(filename);    
-
+    
     if ( ! result)
       throw XmlException(XmlException::InvalidXmlDocument);    
     return res;
@@ -74,5 +74,12 @@ namespace gris
     XmlNode result;
     result.setRoot(mp->doc.first_child());
     return result;
+  }
+
+  /**
+  */
+  void XmlDocument::fromString(const char* string)  
+  {
+    mp->doc.load_string(string);
   }
 }

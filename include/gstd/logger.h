@@ -3,8 +3,6 @@
 
 #include "gstd_api.h"
 
-#include <loki/Singleton.h>
-
 #include <ostream>
 #include <sstream>
 #include <fstream>

@@ -23,11 +23,13 @@ namespace gris
       static void                         save(const char* filename, XmlDocument&);
 
     public:
-      XmlDocument();      
+      XmlDocument();
       ~XmlDocument();
 
     public:
       XmlNode getRoot();
+
+      void fromString(const char* string);
 
     private:
       struct Impl;
