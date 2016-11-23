@@ -10,59 +10,44 @@ namespace gris
 {
   namespace gstd
   {
-    //typedef std::map<std::string, std::unique_ptr<IProperty>> PropertyMap;
-    //PropertyMap mProperties;
-
-    DynamicProperty::DynamicProperty(const DynamicProperty& o)
+    /**
+    */
+    const std::string& IProperty::truthValueTo01Str(const std::string& value)
     {
-      /*std::for_each(o.mProperties.begin(), o.mProperties.end(), [&] (const auto& pair)
-      {
-        mProperties.insert(std::make_pair(pair.first, std::make_unique<*pair.second));
-      });*/
+      static const std::string falseValue = "0"; // boost::lexical_cast can only cast "0" to (bool) false 
+      static const std::string trueValue  = "1"; // boost::lexical_cast can only cast "1" to (bool) true 
+      return (value.empty() || value == falseValue ||
+        value == "false" || value == "FALSE" || value == "False" || value == "f" || value == "F") ? falseValue : trueValue;
     }
 
-    DynamicProperty::DynamicProperty(const DynamicProperty&& o)
-      //: mProperties(std::move(o.mProperties))
+    void DynamicProperty::getProperties(std::vector<std::string>& props) const
     {
-    }
-
-    DynamicProperty& DynamicProperty::operator=(const DynamicProperty& o)
-    {
-     // swap(o);
-      return *this;
-    }
-
-    void DynamicProperty::swap(DynamicProperty& o)
-    {
-    }
-
-    void DynamicProperty::get(const char* name, std::ostream& os) const
-    {
-      auto iter = mProperties.find(name);
-      if ( mProperties.end() == iter )
-      {
-        throw std::exception( (boost::format("no such key: %s") % name).str().c_str() );
-      }
-      *(iter->second.get()) << os;
-    }
-
-    void DynamicProperty::set(const char* name, const char* val)
-    {
-      auto iter = mProperties.find(name);
-      if ( mProperties.end() == iter )
-      {
-        throw std::exception( (boost::format("no such key: %s") % name).str().c_str() );
-      }
-      std::istringstream is(val);
-      *(iter->second.get()) >> is;
-    }
-
-    std::vector<const char*> DynamicProperty::getProperties() const
-    {
-      std::vector<const char*> props;
       for (const auto& pair : mProperties)
-        props.push_back(pair.first.c_str());
-      return props;
+        props.push_back(pair.first);
     }
+
+    bool DynamicProperty::setParam(const std::string& key, const std::string& value)
+    {
+      PropertyMap::const_iterator it = mProperties.find(key);
+      if (it != mProperties.end())
+        return it->second->setValue(value);
+      else
+      {
+        throw std::exception( (boost::format("Parameter '%s' was not found") % key.c_str()).str().c_str() );        
+      }
+      return true;
+    }
+    
+    bool DynamicProperty::getParam(const std::string& key, std::string& value) const
+    {
+      PropertyMap::const_iterator it = mProperties.find(key);
+      if (it != mProperties.end())
+      {
+        value = it->second->getValue();
+        return true;
+      }
+      return false;
+    }
+
   }
 }

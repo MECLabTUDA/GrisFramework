@@ -34,7 +34,6 @@ set(Private_Includes
 set(Sources	
 	dynamicProperty.cpp
 	dynamicPropertyManager.cpp
-	#DynamicPropertyTemplates.cpp
 	logger.cpp
 	GrisFileLogger.cpp
 	XmlDocument.cpp
