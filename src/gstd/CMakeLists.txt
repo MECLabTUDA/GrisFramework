@@ -43,7 +43,7 @@ set(Sources
 	Vector.cpp
 	)
 set(Resources
-	resource.rc
+	${INC_DIR}resource.rc
 	)	
 
 add_library(gstd SHARED
