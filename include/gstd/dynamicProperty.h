@@ -141,13 +141,10 @@ namespace gris {
         bool getParam(const std::string& key, std::string& value) const;
 
         /** \brief Get the number of parameters maintained by this instance */
-        std::size_t size() const
-        {
-          return mProperties.size();
-        }
+        std::size_t size() const        { return mProperties.size(); }
                         
       private:
-        typedef std::map<std::string, std::shared_ptr<IProperty>> PropertyMap;
+        using PropertyMap = std::map<std::string, std::shared_ptr<IProperty>>;
         PropertyMap mProperties;
     };
 

@@ -15,45 +15,8 @@ namespace
   {
     return 0 == lhs.compare(rhs);
   }
-
 }
-//
-//namespace gris
-//{
-//  namespace gstd
-//  {
-//    /*void operator>>(std::istream& is, Vec3d& vec)
-//    {
-//      std::string str;
-//      is >> str;
-//      std::stringstream ss(str);
-//      ss >> vec.x();
-//      ss >> vec.y();
-//      ss >> vec.z();
-//    }*/
-//    std::ostream& operator<<(std::ostream& os, bool b)
-//    {
-//      if (b)
-//        os << "true";
-//      else
-//        os << "false";
-//      return os;
-//    }
-//
-//    std::istream& operator>>(std::istream& is, bool& b)
-//    {
-//      std::string s;
-//      is >> s;
-//      if (0 == strcmp(s.c_str(), "true")
-//        || 0 == strcmp(s.c_str(), "True")
-//        || 0 == strcmp(s.c_str(), "1"))
-//        b = true;
-//      else
-//        b = false;
-//      return is;
-//    }
-//  }
-//}
+
 
 namespace gris
 {
@@ -64,8 +27,27 @@ namespace gris
     std::string value;
     test.getParam("double", value);
     value.resize(5); // make sure rounding is ignored
-    std::cout << value << std::endl;
     BOOST_CHECK(equals("42.42", value));    
+  }
+
+  void testInt()
+  {
+    TestClass test;
+    const std::string ref = "42";    
+    test.setParam("int", ref);
+    std::string value;
+    test.getParam("int", value);
+    BOOST_CHECK(equals("42", value));
+  }
+
+  void testSize_t()
+  {
+    TestClass test;
+    const std::string ref = "42";    
+    test.setParam("size_t", ref);
+    std::string value;
+    test.getParam("size_t", value);
+    BOOST_CHECK(equals("42", value));
   }
 
   void testBool()
@@ -77,15 +59,12 @@ namespace gris
       // check possibilities for false
       test.setParam("bool", "0");
       test.getParam("bool", value);
-      std::cout << "value " << value << std::endl;
       BOOST_CHECK(equals("0", value));
       test.setParam("bool", "false");
       test.getParam("bool", value);
-      std::cout << "value " << value << std::endl;
       BOOST_CHECK(equals("0", value));
       test.setParam("bool", "False");
       test.getParam("bool", value);
-      std::cout << "value " << value << std::endl;
       BOOST_CHECK(equals("0", value));
       // check possibilities for true
       test.setParam("bool", "1");
@@ -112,9 +91,37 @@ namespace gris
     test.setVec3d(Vec3d(41,42,43));
     std::string value;
     test.getParam("Vec3d", value);
-    //value.resize(5); // make sure rounding is ignored
-    std::cout << value << std::endl;
     BOOST_CHECK(equals("41 42 43", value));
+  }
+
+  void testVecDouble()
+  {
+    try
+    {
+      using namespace std;
+      std::vector<double> v(1,1);
+      std::cout << "v " << v << endl;
+      v.clear();
+      std::string str("1.0");
+      std::istringstream iss(str);
+      iss >> v;
+      std::cout << "v " << v << endl;
+
+      using namespace gstd;
+      TestClass test;
+      const std::string ref = "1.2";
+      std::cout << "ref " << ref << std::endl;
+      test.setParam("VecDouble", ref);
+      std::string value;
+      test.getParam("VecDouble", value);
+      std::cout << "value " << value << std::endl;
+      BOOST_CHECK(equals(ref, value));
+    }
+    catch (std::exception& e)
+    {
+      std::cout << e.what() << std::endl;
+      throw e;
+    }
   }
 
   void testKeys()
