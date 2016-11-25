@@ -12,6 +12,10 @@ namespace std
 
 namespace gris
 {
+  class TestSubClass;
+
+  /**
+  */
   class TestClass : public gris::gstd::DynamicProperty
   {
   public:
@@ -24,9 +28,8 @@ namespace gris
       void   setInt(int x)        { mInt = x; }
       size_t getSize_t() const    { return mSize_t; }
       void   setSize_t(size_t x)  { mSize_t = x; }
-
-      bool getBool() const { return mBool; }
-      void setBool(bool b) { mBool = b; }
+      bool   getBool() const      { return mBool; }
+      void   setBool(bool b)      { mBool = b; }
 
       const gstd::Vec3d&  getVec3d() const { return mVec; }
       void                setVec3d(const gstd::Vec3d& vec) { mVec = vec; }
@@ -41,5 +44,23 @@ namespace gris
       size_t mSize_t;
       gstd::Vec3d  mVec;
       std::vector<double> mVecDouble;
+      std::unique_ptr<TestSubClass> mpSubClass;
+      std::unique_ptr<TestSubClass> mpSubClassPrefix;
+  };
+
+  /**
+  */
+  class TestSubClass : public gris::gstd::DynamicProperty
+  {
+    public:
+      TestSubClass();
+      ~TestSubClass();
+
+    public:
+      double getDouble() const    { return mDouble; }
+      void   setDouble(double x)  { mDouble = x; }
+
+    private:
+      double mDouble;
   };
 }

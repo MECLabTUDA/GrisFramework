@@ -19,34 +19,85 @@ namespace gris
       return (value.empty() || value == falseValue ||
         value == "false" || value == "FALSE" || value == "False" || value == "f" || value == "F") ? falseValue : trueValue;
     }
-
-    void DynamicProperty::getProperties(std::vector<std::string>& props) const
-    {
-      for (const auto& pair : mProperties)
-        props.push_back(pair.first);
-    }
-
-    bool DynamicProperty::setParam(const std::string& key, const std::string& value)
+    
+    bool DynamicProperty::setProperty(const std::string& key, const std::string& value)
     {
       PropertyMap::const_iterator it = mProperties.find(key);
       if (it != mProperties.end())
         return it->second->setValue(value);
       else
       {
-        throw std::exception( (boost::format("Parameter '%s' was not found") % key.c_str()).str().c_str() );        
+        throw std::exception( (boost::format("setProperty: Property with key '%s' was not found") % key.c_str()).str().c_str() );        
       }
       return true;
     }
     
-    bool DynamicProperty::getParam(const std::string& key, std::string& value) const
+    bool DynamicProperty::getProperty(const std::string& key, std::string& value) const
     {
       PropertyMap::const_iterator it = mProperties.find(key);
       if (it != mProperties.end())
       {
         value = it->second->getValue();
-        return true;
       }
-      return false;
+      else
+      {
+        throw std::exception( (boost::format("getProperty: Property with key '%s' was not found") % key.c_str()).str().c_str() );
+      }
+      return true;
+    }
+
+    void DynamicProperty::getPropertyNames(std::vector<std::string> &props) const
+    {
+      props.clear();
+      props.reserve(mProperties.size());
+      for (std::map<std::string, std::shared_ptr<IProperty>>::const_iterator it = mProperties.begin() ; it != mProperties.end() ; ++it)
+        props.push_back(it->first);
+    }
+
+    void DynamicProperty::getPropertyValues(std::vector<std::string> &vals) const
+    {
+      std::vector<std::string> names;
+      getPropertyNames(names);
+      vals.resize(names.size());
+      for (std::size_t i = 0 ; i < names.size() ; ++i)
+        vals[i] = mProperties.find(names[i])->second->getValue();
+    }
+
+    const std::map<std::string, std::shared_ptr<IProperty>>& DynamicProperty::getPropertyMap() const
+    {
+      return mProperties;
+    }
+
+    bool DynamicProperty::hasProperty(const std::string &key) const
+    {
+      return mProperties.find(key) != mProperties.end();
+    }
+
+    void DynamicProperty::include(const DynamicProperty &other, const std::string &prefix)
+    {
+      const std::map<std::string, std::shared_ptr<IProperty>> &p = other.getPropertyMap();
+      if (prefix.empty())
+        for (std::map<std::string, std::shared_ptr<IProperty>>::const_iterator it = p.begin() ; it != p.end() ; ++it)
+          mProperties[it->first] = it->second;
+      else
+        for (std::map<std::string, std::shared_ptr<IProperty>>::const_iterator it = p.begin() ; it != p.end() ; ++it)
+          mProperties[prefix + "." + it->first] = it->second;
+    }
+
+    void DynamicProperty::remove(const std::string &name)
+    {
+      mProperties.erase(name);
+    }
+
+    void DynamicProperty::clear()
+    {
+      mProperties.clear();
+    }
+
+    void DynamicProperty::print(std::ostream &out) const
+    {
+      for (std::map<std::string, std::shared_ptr<IProperty>>::const_iterator it = mProperties.begin() ; it != mProperties.end() ; ++it)
+        out << it->first << " = " << it->second->getValue() << std::endl;
     }
 
   }

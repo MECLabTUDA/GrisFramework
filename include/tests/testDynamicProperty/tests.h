@@ -11,7 +11,9 @@ namespace gris
   void testVec3d();
   void testVecDouble();
 
-  void testKeys();
-  void testBadKey();
-  void testInvalidChar();
+  void testSubClass();
+  void testSubClassWithPrefix();
+
+  void testSetBadKey();
+  void testGetBadKey();
 }

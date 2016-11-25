@@ -17,6 +17,7 @@ namespace
   }
 }
 
+using namespace gris::gstd;
 
 namespace gris
 {
@@ -25,7 +26,7 @@ namespace gris
     TestClass test;
     test.setDouble(42.42);
     std::string value;
-    test.getParam("double", value);
+    test.getProperty("double", value);
     value.resize(5); // make sure rounding is ignored
     BOOST_CHECK(equals("42.42", value));    
   }
@@ -34,9 +35,9 @@ namespace gris
   {
     TestClass test;
     const std::string ref = "42";    
-    test.setParam("int", ref);
+    test.setProperty("int", ref);
     std::string value;
-    test.getParam("int", value);
+    test.getProperty("int", value);
     BOOST_CHECK(equals("42", value));
   }
 
@@ -44,9 +45,9 @@ namespace gris
   {
     TestClass test;
     const std::string ref = "42";    
-    test.setParam("size_t", ref);
+    test.setProperty("size_t", ref);
     std::string value;
-    test.getParam("size_t", value);
+    test.getProperty("size_t", value);
     BOOST_CHECK(equals("42", value));
   }
 
@@ -57,24 +58,24 @@ namespace gris
       TestClass test;
       std::string value;
       // check possibilities for false
-      test.setParam("bool", "0");
-      test.getParam("bool", value);
+      test.setProperty("bool", "0");
+      test.getProperty("bool", value);
       BOOST_CHECK(equals("0", value));
-      test.setParam("bool", "false");
-      test.getParam("bool", value);
+      test.setProperty("bool", "false");
+      test.getProperty("bool", value);
       BOOST_CHECK(equals("0", value));
-      test.setParam("bool", "False");
-      test.getParam("bool", value);
+      test.setProperty("bool", "False");
+      test.getProperty("bool", value);
       BOOST_CHECK(equals("0", value));
       // check possibilities for true
-      test.setParam("bool", "1");
-      test.getParam("bool", value);
+      test.setProperty("bool", "1");
+      test.getProperty("bool", value);
       BOOST_CHECK(equals("1", value));
-      test.setParam("bool", "true");
-      test.getParam("bool", value);
+      test.setProperty("bool", "true");
+      test.getProperty("bool", value);
       BOOST_CHECK(equals("1", value));
-      test.setParam("bool", "True");
-      test.getParam("bool", value);
+      test.setProperty("bool", "True");
+      test.getProperty("bool", value);
       BOOST_CHECK(equals("1", value));
     }
     catch (std::exception& e)
@@ -86,11 +87,10 @@ namespace gris
   
   void testVec3d()
   {
-    using namespace gstd;
     TestClass test;
     test.setVec3d(Vec3d(41,42,43));
     std::string value;
-    test.getParam("Vec3d", value);
+    test.getProperty("Vec3d", value);
     BOOST_CHECK(equals("41 42 43", value));
   }
 
@@ -98,23 +98,11 @@ namespace gris
   {
     try
     {
-      using namespace std;
-      std::vector<double> v(1,1);
-      std::cout << "v " << v << endl;
-      v.clear();
-      std::string str("1.0");
-      std::istringstream iss(str);
-      iss >> v;
-      std::cout << "v " << v << endl;
-
-      using namespace gstd;
       TestClass test;
       const std::string ref = "1.2";
-      std::cout << "ref " << ref << std::endl;
-      test.setParam("VecDouble", ref);
+      test.setProperty("VecDouble", ref);
       std::string value;
-      test.getParam("VecDouble", value);
-      std::cout << "value " << value << std::endl;
+      test.getProperty("VecDouble", value);
       BOOST_CHECK(equals(ref, value));
     }
     catch (std::exception& e)
@@ -124,39 +112,64 @@ namespace gris
     }
   }
 
-  void testKeys()
+  /**
+  */
+  void testSubClass()
   {
     try
-    {
-      /*TestClass t;
-      std::vector<std::string> keysIst;
-      t.getProperties(keysIst);
-      std::vector<std::string> keysSoll = {"x", "valid", "double vector" };
-      if (keysIst.size() != keysSoll.size())
-        throw std::exception("Error: Sizes of key-vectors are not equal!");
-      for (size_t i(0); i<keysIst.size(); ++i)
-      {
-        BOOST_CHECK_EQUAL(true, keysSoll.end() != std::find_if(keysSoll.begin(), keysSoll.end(), [&] (const auto& obj) { return 0 == keysIst[i].compare(obj); }));
-      }  */    
+    {  
+      TestClass test;
+      const std::string key = "SubClassDouble";
+      const std::string ref = "42.42";
+      test.setProperty(key, ref);
+      std::string value;
+      test.getProperty(key, value);
+      value.resize(5); // ignore rounding errors
+      BOOST_CHECK(equals(ref, value));
     }
     catch (std::exception& e)
     {
-      std::cout << e.what() << endl;
+      std::cout << e.what() << std::endl;
       throw e;
-    }    
+    }
   }
 
   /**
   */
-  void testBadKey()
+  void testSubClassWithPrefix()
+  {
+    try
+    {  
+      TestClass test;
+      const std::string key = "prefix.SubClassDouble";
+      const std::string ref = "42.42";
+      test.setProperty(key, ref);
+      std::string value;
+      test.getProperty(key, value);
+      value.resize(5); // ignore rounding errors
+      BOOST_CHECK(equals(ref, value));
+    }
+    catch (std::exception& e)
+    {
+      std::cout << e.what() << std::endl;
+      throw e;
+    }
+  }
+
+  /**
+  */
+  void testSetBadKey()
   {
     try
     {
-    
+      TestClass test;
+      const std::string key = "nonexistent";
+      const std::string ref = "dummy";
+      test.setProperty(key, ref);
     }
     catch (std::exception& e)
-    {      
-      BOOST_CHECK( 0==strcmp(e.what(), "no such key") );
+    {
+      BOOST_CHECK( 0==strcmp(e.what(), "setProperty: Property with key 'nonexistent' was not found") );
       throw e;
     }
   }
@@ -169,15 +182,18 @@ namespace gris
 
   /**
   */
-  void testInvalidChar()
+  void testGetBadKey()
   {
     try
     {
-      
+      TestClass test;
+      const std::string key = "nonexistent";
+      std::string value;
+      test.getProperty(key, value);
     }
     catch (std::exception& e)
     {
-      BOOST_CHECK( 0==strcmp(e.what(), "no such key") );
+      BOOST_CHECK( 0==strcmp(e.what(), "getProperty: Property with key 'nonexistent' was not found") );
       throw e;
     }
   }

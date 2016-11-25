@@ -26,7 +26,10 @@ BOOST_AUTO_TEST_CASE( test_case )
   BOOST_CHECK_NO_THROW(gris::testBool());
   BOOST_CHECK_NO_THROW(gris::testVec3d());
   BOOST_CHECK_NO_THROW(gris::testVecDouble());
-  //BOOST_CHECK_NO_THROW(gris::testKeys());
-  //BOOST_CHECK_THROW(gris::testBadKey(), std::exception);  
-  //BOOST_CHECK_THROW(gris::testInvalidChar(), std::exception);*/
+
+  BOOST_CHECK_NO_THROW(gris::testSubClass());
+  BOOST_CHECK_NO_THROW(gris::testSubClassWithPrefix());
+  
+  BOOST_CHECK_THROW(gris::testSetBadKey(), std::exception);
+  BOOST_CHECK_THROW(gris::testGetBadKey(), std::exception);
 }

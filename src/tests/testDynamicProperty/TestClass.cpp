@@ -40,6 +40,8 @@ namespace gris
     : mDouble(0)
     , mBool(0)
     , mVec(0,0,0)
+    , mpSubClass(std::make_unique<TestSubClass>())
+    , mpSubClassPrefix(std::make_unique<TestSubClass>())    
   {
     declareProperty<double>("double", 
       std::bind(&TestClass::setDouble, this, std::placeholders::_1), 
@@ -64,5 +66,23 @@ namespace gris
     declareProperty<std::vector<double>>("VecDouble",
       std::bind(&TestClass::setVecDouble, this, std::placeholders::_1),
       std::bind(&TestClass::getVecDouble, this));
+
+    include(*mpSubClass);
+    include(*mpSubClassPrefix, "prefix");
+  }
+
+  /**
+  */
+  TestSubClass::TestSubClass()
+  {
+    declareProperty<double>("SubClassDouble", 
+      std::bind(&TestSubClass::setDouble, this, std::placeholders::_1), 
+      std::bind(&TestSubClass::getDouble, this));
+  }
+
+  /**
+  */
+  TestSubClass::~TestSubClass()
+  {
   }
 }

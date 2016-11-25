@@ -76,7 +76,7 @@ namespace gris {
           catch (boost::bad_lexical_cast &e)
           {
             result = false;
-            throw std::exception( (boost::format("Invalid value format specified: %s") % e.what() ).str().c_str() );
+            throw std::exception( (boost::format("Unable to set property from string: %s (error: %s)") % value % e.what() ).str().c_str() );
           }
           return result;
         }
@@ -88,9 +88,9 @@ namespace gris {
           {
             return boost::lexical_cast<std::string>(mGetter());
           }
-          catch (boost::bad_lexical_cast &e)
+          catch (boost::bad_lexical_cast& e)
           {
-            throw std::exception((boost::format("Unable to cast Property to string: %s") % e.what()).str().c_str());
+            throw std::exception((boost::format("Unable to cast property to a string (error: %s)") % e.what()).str().c_str());
             return "";
           }
           else
@@ -118,30 +118,42 @@ namespace gris {
         {
           mProperties.insert(std::make_pair(name, std::make_unique<Property<T>>(setter, getter)));
         }
+
+        /** \brief Add a parameter to the set */
+        void add(const std::shared_ptr<IProperty> & prop);
+
+        /** \brief Remove a parameter from the set */
+        void remove(const std::string &name);
+
+        /** \brief Include the params of a different ParamSet into this one. Optionally include a prefix for each of the parameters */
+        void include(const DynamicProperty& other, const std::string& prefix = "");
       
         /** \brief List the names of the known parameters */
-        void getProperties(std::vector<std::string>& params) const;
+        void getPropertyNames(std::vector<std::string>& params) const;
 
-        /** \brief Algorithms in OMPL often have parameters that
-        can be set externally. While each algorithm will have
-        their own getter and setter functions specifically for
-        those parameters, this function allows setting
-        parameters generically, for any algorithm that
-        declares parameters, by specifying the parameter name
-        \e key and its value \e value (both as string, but \e
-        value is cast to the type desired by the corresponding
-        setter). Under the hood, this calls SpecificParam::setValue().
-        This ability makes it easy to automatically configure
-        using external sources (e.g., a configuration
-        file). The function returns true if the parameter was
-        parsed and set successfully and false otherwise. */
-        bool setParam(const std::string& key, const std::string& value);
+        /** \brief List the values of the known parameters, in the same order as getParamNames() */
+        void getPropertyValues(std::vector<std::string> &vals) const;
+
+        /** \brief Get the map from parameter names to parameter descriptions */
+        const std::map<std::string, std::shared_ptr<IProperty>>& getPropertyMap() const;
+
+        /** \brief Tries to cast the string \e value to the specific Property type T. returns true if the cast succeeds, returns false otherwise. */
+        bool setProperty(const std::string& key, const std::string& value);
 
         /** \brief Get the value of the parameter named \e key. Store the value as string in \e value and return true if the parameter was found. Return false otherwise. */
-        bool getParam(const std::string& key, std::string& value) const;
+        bool getProperty(const std::string& key, std::string& value) const;
+
+        /** \brief Check whether this set of parameters includes the parameter named \e key */
+        bool hasProperty(const std::string &key) const;
 
         /** \brief Get the number of parameters maintained by this instance */
         std::size_t size() const        { return mProperties.size(); }
+
+        /** \brief Clear all the set parameters */
+        void clear();
+
+        /** \brief Print the parameters to a stream */
+        void print(std::ostream &out) const;
                         
       private:
         using PropertyMap = std::map<std::string, std::shared_ptr<IProperty>>;
