@@ -50,7 +50,7 @@ namespace gris
     {
       props.clear();
       props.reserve(mProperties.size());
-      for (std::map<std::string, std::shared_ptr<IProperty>>::const_iterator it = mProperties.begin() ; it != mProperties.end() ; ++it)
+      for (PropertyMap::const_iterator it = mProperties.begin() ; it != mProperties.end() ; ++it)
         props.push_back(it->first);
     }
 
@@ -63,7 +63,7 @@ namespace gris
         vals[i] = mProperties.find(names[i])->second->getValue();
     }
 
-    const std::map<std::string, std::shared_ptr<IProperty>>& DynamicProperty::getPropertyMap() const
+    const DynamicProperty::PropertyMap& DynamicProperty::getPropertyMap() const
     {
       return mProperties;
     }
@@ -75,12 +75,12 @@ namespace gris
 
     void DynamicProperty::include(const DynamicProperty &other, const std::string &prefix)
     {
-      const std::map<std::string, std::shared_ptr<IProperty>> &p = other.getPropertyMap();
+      const PropertyMap &p = other.getPropertyMap();
       if (prefix.empty())
-        for (std::map<std::string, std::shared_ptr<IProperty>>::const_iterator it = p.begin() ; it != p.end() ; ++it)
+        for (PropertyMap::const_iterator it = p.begin() ; it != p.end() ; ++it)
           mProperties[it->first] = it->second;
       else
-        for (std::map<std::string, std::shared_ptr<IProperty>>::const_iterator it = p.begin() ; it != p.end() ; ++it)
+        for (PropertyMap::const_iterator it = p.begin() ; it != p.end() ; ++it)
           mProperties[prefix + "." + it->first] = it->second;
     }
 
@@ -96,7 +96,7 @@ namespace gris
 
     void DynamicProperty::print(std::ostream &out) const
     {
-      for (std::map<std::string, std::shared_ptr<IProperty>>::const_iterator it = mProperties.begin() ; it != mProperties.end() ; ++it)
+      for (PropertyMap::const_iterator it = mProperties.begin() ; it != mProperties.end() ; ++it)
         out << it->first << " = " << it->second->getValue() << std::endl;
     }
 

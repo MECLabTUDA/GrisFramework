@@ -21,6 +21,16 @@ using namespace gris::gstd;
 
 namespace gris
 {
+  /**
+  */
+  void showProperties()
+  {
+    TestClass test;
+    test.print(std::cout);
+  }
+
+  /**
+  */
   void testDouble()
   {
     TestClass test;

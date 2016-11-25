@@ -20,6 +20,8 @@ BOOST_AUTO_TEST_CASE( test_case )
 {
   BOOST_CHECK( true );
 
+  BOOST_CHECK_NO_THROW(gris::showProperties());
+
   BOOST_CHECK_NO_THROW(gris::testDouble());
   BOOST_CHECK_NO_THROW(gris::testInt());
   BOOST_CHECK_NO_THROW(gris::testSize_t());

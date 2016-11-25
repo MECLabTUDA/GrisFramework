@@ -8,7 +8,8 @@ namespace std
 {
   ostream& operator<<(ostream& os, const std::vector<double>& v)
   {
-    std::for_each(v.begin(), v.end() -1 , [&] (double d) { os << v << " " ; });
+    for(int i(0); i<(int)v.size()-1; ++i)
+      os << v[i] << " " ;
     if( ! v.empty())
       os << v.back();
     return os;
@@ -16,7 +17,7 @@ namespace std
 
   istream& operator>>(istream& is, std::vector<double>& v)
   {
-    double val (0);
+    double val (0);    
     while(is >> val || !is.eof()) 
     {
       if(is.fail()) 
@@ -39,7 +40,10 @@ namespace gris
   TestClass::TestClass()
     : mDouble(0)
     , mBool(0)
+    , mSize_t(0)
+    , mInt(0)
     , mVec(0,0,0)
+    //, mVecDouble {0.0} 
     , mpSubClass(std::make_unique<TestSubClass>())
     , mpSubClassPrefix(std::make_unique<TestSubClass>())    
   {
@@ -74,6 +78,7 @@ namespace gris
   /**
   */
   TestSubClass::TestSubClass()
+    : mDouble(0.0)
   {
     declareProperty<double>("SubClassDouble", 
       std::bind(&TestSubClass::setDouble, this, std::placeholders::_1), 

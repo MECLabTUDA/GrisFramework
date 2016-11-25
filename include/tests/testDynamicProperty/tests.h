@@ -4,6 +4,8 @@
 
 namespace gris
 {
+  void showProperties();
+
   void testDouble();
   void testInt();
   void testSize_t();
