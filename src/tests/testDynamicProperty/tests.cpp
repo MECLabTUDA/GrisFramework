@@ -1,5 +1,6 @@
 #include "private/test.pch"
 #include "tests.h"
+#include "TestClass.h"
 
 #include <boost/test/auto_unit_test.hpp>
 

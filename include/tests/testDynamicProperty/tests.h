@@ -1,7 +1,5 @@
 #pragma once
 
-#include "TestClass.h"
-
 namespace gris
 {
   void showProperties();

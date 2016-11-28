@@ -76,7 +76,7 @@ namespace gris {
           catch (boost::bad_lexical_cast &e)
           {
             result = false;
-            throw std::exception( (boost::format("Unable to set property from string: %s (error: %s)") % value % e.what() ).str().c_str() );
+            throw std::exception( (boost::format("Unable to set property from string: '%s' (error: %s)") % value % e.what() ).str().c_str() );
           }
           return result;
         }
@@ -104,8 +104,6 @@ namespace gris {
 
     class GRIS_GSTD_API DynamicProperty
     {
-      friend class DynamicPropertyManager;
-
       public:
         DynamicProperty() {}
         ~DynamicProperty() {}
