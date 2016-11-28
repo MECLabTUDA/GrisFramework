@@ -32,8 +32,8 @@ set(Private_Includes
 	${INC_DIR}private/targetver.h
 	)	
 set(Sources	
-	dynamicProperty.cpp
-	dynamicPropertyManager.cpp
+	DynamicProperty.cpp
+	DynamicPropertyManager.cpp
 	logger.cpp
 	GrisFileLogger.cpp
 	XmlDocument.cpp
@@ -54,7 +54,7 @@ add_library(gstd SHARED
 	
 target_link_libraries( gstd	
 	pugixml
-	${BOOST_FILESYSTEM_R}
+	#${BOOST_FILESYSTEM_R}
 	)
 	
 source_group("Header Files\\private" FILES
@@ -63,6 +63,20 @@ source_group("Header Files\\private" FILES
 source_group("Resources" FILES
 	${Resources}
 	)
+
+# ---------- post build 
+
+set(IPATH ${CMAKE_BINARY_DIR}/src/)
+set(OPATH ${CMAKE_INSTALL_PREFIX}/bin/)
+
+file(MAKE_DIRECTORY ${OPATH})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${IPATH}${MODULE_NAME}/$<CONFIG>/${PROJECT_NAME}.dll		${OPATH})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${IPATH}${MODULE_NAME}/$<CONFIG>/${PROJECT_NAME}.pdb		${OPATH})
+
+# ---------- install
 
 install(TARGETS gstd LIBRARY ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
     )
