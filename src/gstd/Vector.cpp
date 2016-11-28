@@ -45,7 +45,7 @@ namespace gris
 
     std::istream& operator>>(std::istream& is, Vec3d& obj)
     {
-      return is >> obj.x() >> obj.y() >> obj.z();
+      return obj.operator>>(is);
     }
 
   }

@@ -36,6 +36,14 @@ namespace gris
         {
           return os << x() << " " << y() << " " << z();
         }
+
+        std::istream& operator>>(std::istream& is)
+        {
+          is >> x(); is.get();
+          is >> y(); is.get();
+          is >> z();
+          return is;
+        }
       
       private:
         double data[3];
