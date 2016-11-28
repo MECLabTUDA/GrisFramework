@@ -41,7 +41,7 @@ namespace gris
     path fn(filename);
     if ( ! is_regular_file(fn) )
       throw XmlException(XmlException::FileNotFound);
-    auto res = std::make_unique<XmlDocument>();
+    std::unique_ptr<XmlDocument> res( new XmlDocument() );
     pugi::xml_parse_result result = res->mp->doc.load_file(filename);    
     
     if ( ! result)
@@ -53,7 +53,7 @@ namespace gris
   */
   std::unique_ptr<XmlDocument> XmlDocument::create(const char* rootName)
   {
-    auto res = std::make_unique<XmlDocument>();
+    std::unique_ptr<XmlDocument> res( new XmlDocument() );
     res->mp->doc.append_child(rootName);
     return res;
   }

@@ -21,10 +21,12 @@ namespace gris
       static std::unique_ptr<XmlDocument> create(const char* rootName);
       static std::unique_ptr<XmlDocument> read(const char* filename);
       static void                         save(const char* filename, XmlDocument&);
-
+      
     public:
-      XmlDocument();
       ~XmlDocument();
+
+    private:
+      XmlDocument();
 
     public:
       XmlNode getRoot();
