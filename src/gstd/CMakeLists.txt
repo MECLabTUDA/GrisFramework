@@ -22,7 +22,6 @@ set(Includes
 	${INC_DIR}XmlAttribute.h
 	${INC_DIR}DynamicProperty.h
 	${INC_DIR}DynamicPropertyManager.h
-	${INC_DIR}DynamicPropertyTemplates.hxx
 	${INC_DIR}logger.h
 	${INC_DIR}GrisFileLogger.h
 	${INC_DIR}gstd_api.h
