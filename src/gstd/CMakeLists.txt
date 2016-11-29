@@ -22,7 +22,6 @@ set(Includes
 	${INC_DIR}XmlAttribute.h
 	${INC_DIR}DynamicProperty.h
 	${INC_DIR}DynamicPropertyManager.h
-	${INC_DIR}DynamicPropertyTemplates.hxx
 	${INC_DIR}logger.h
 	${INC_DIR}GrisFileLogger.h
 	${INC_DIR}gstd_api.h
@@ -32,21 +31,18 @@ set(Private_Includes
 	${INC_DIR}private/targetver.h
 	)	
 set(Sources	
-	dynamicProperty.cpp
-	dynamicPropertyManager.cpp
-	#DynamicPropertyTemplates.cpp
+	DynamicProperty.cpp
+	DynamicPropertyManager.cpp
 	logger.cpp
 	GrisFileLogger.cpp
 	XmlDocument.cpp
 	XmlNode.cpp
 	XmlAttribute.cpp
+	Vector.cpp
 	)
 set(Resources
-	resource.rc
+	${INC_DIR}resource.rc
 	)	
-
-#set(Precompiled_Sources "")	
-#add_msvc_precompiled_header("muk_common.pch" "muk_common.cpp" ${Sources} )
 
 add_library(gstd SHARED
 	${Includes}
@@ -57,7 +53,7 @@ add_library(gstd SHARED
 	
 target_link_libraries( gstd	
 	pugixml
-	${BOOST_FILESYSTEM_R}
+	#${BOOST_FILESYSTEM_R}
 	)
 	
 source_group("Header Files\\private" FILES
@@ -67,6 +63,25 @@ source_group("Resources" FILES
 	${Resources}
 	)
 
-install(TARGETS gstd DESTINATION ${CMAKE_INSTALL_PREFIX}/gstd/
-    )
+# ---------- post build 
+
+set(IPATH ${CMAKE_BINARY_DIR}/src/)
+set(OPATH ${CMAKE_INSTALL_PREFIX}/apps/)
+
+file(MAKE_DIRECTORY ${OPATH})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${IPATH}${MODULE_NAME}/$<CONFIG>/${PROJECT_NAME}.dll		${OPATH})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${IPATH}${MODULE_NAME}/$<CONFIG>/${PROJECT_NAME}.pdb		${OPATH})
+
+# ---------- install
+install(TARGETS gstd RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/apps    )
+
+install(TARGETS gstd LIBRARY ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ )
+install(TARGETS gstd RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/ )
+install(DIRECTORY ${INC_DIR} DESTINATION include/gstd
+		 FILES_MATCHING PATTERN "*.h"
+		 )
+		 
 	

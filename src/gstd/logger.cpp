@@ -2,6 +2,8 @@
 #include "logger.h"
 #include "GrisFileLogger.h"
 
+#include <loki/Singleton.h>
+
 #pragma warning(push)
 #pragma warning(disable: 4996)
 #include <time.h>

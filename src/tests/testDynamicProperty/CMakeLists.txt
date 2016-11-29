@@ -2,31 +2,32 @@ project(testDynamicProperty)
 
 set(INC_DIR ${CMAKE_SOURCE_DIR}/include/${MODULE_NAME}/${PROJECT_NAME}/)
 
-include_directories(
-	${INC_DIR}
-	${CMAKE_SOURCE_DIR}/include
-	${LOKI_INCLUDE_DIR}	
-	${BOOST_INCLUDE_DIR}
-	)
-
 link_directories(
 	${PUGI_LIB_DIR}
 	${BOOST_LIB_DIR}
 )
-
-set(Sources	
-	tests.cpp
-	TestClass.cpp
-	boostTestCase.cpp
-	)	
-set(Includes
-	${INC_DIR}tests.h
-	${INC_DIR}TestClass.h
-	)
+	
 set(Private_Includes
 	${INC_DIR}private/test.pch
 	)
-set(Files
+set(Includes
+	${INC_DIR}custom_streams.h
+	${INC_DIR}TestClass.h
+	${INC_DIR}testDynamicPropertyManager.h
+	${INC_DIR}tests.h
+	)
+set(Sources	
+	main.cpp
+	TestClass.cpp
+	testDynamicPropertyManager.cpp	
+	tests.cpp
+	)
+	
+source_group("Header Files\\private" FILES
+	${Private_Includes}
+	)
+	
+source_group("Post-Build Files" FILES
 	${PROJECT_NAME}_deploy.bat
 	)
 
@@ -34,15 +35,13 @@ add_executable(${PROJECT_NAME}
 	${Private_Includes}
 	${Includes}
 	${Sources}
-	${Files}
 	)
-
-source_group("Header Files\\private" FILES
-	${Private_Includes}
-	)
-	
-source_group("Post-Build Files" FILES
-	${PROJECT_NAME}_deploy.bat
+		
+target_include_directories(${PROJECT_NAME} PUBLIC
+	${INC_DIR}
+	${CMAKE_SOURCE_DIR}/include
+	${LOKI_INCLUDE_DIR}	
+	${BOOST_INCLUDE_DIR}
 	)
 	
 target_link_libraries(${PROJECT_NAME}
@@ -52,36 +51,32 @@ target_link_libraries(${PROJECT_NAME}
 	
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${MODULE_NAME})
 
-ADD_CUSTOM_COMMAND(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}_deploy.bat
-		${PROJECT_NAME}
-		${MODULE_NAME}
-		${CMAKE_BINARY_DIR}
-		${CMAKE_INSTALL_PREFIX}\\${MODULE_NAME}\\${PROJECT_NAME}
-	)
+# ---------- post build and install
 
-SET(APPS "${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/${PROJECT_NAME}.exe")
+set(IPATH ${CMAKE_BINARY_DIR}/src/)
+set(OPATH ${CMAKE_INSTALL_PREFIX}/apps/)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/tests/${PROJECT_NAME}/
-    BUNDLE DESTINATION /tests/${PROJECT_NAME} COMPONENT Runtime
-    RUNTIME DESTINATION /tests/${PROJECT_NAME} COMPONENT Runtime
-    )
+file(MAKE_DIRECTORY ${OPATH})
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		${IPATH}${MODULE_NAME}/${PROJECT_NAME}/$<CONFIG>/${PROJECT_NAME}.exe		${OPATH})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${IPATH}${MODULE_NAME}/${PROJECT_NAME}/$<CONFIG>/${PROJECT_NAME}.pdb		${OPATH})
 	
-SET(DIRS 
-	${BOOST_LIB_DIR}
-	${CMAKE_INSTALL_PREFIX}/gstd/
-	)	
-	
-INSTALL(CODE "
-    file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/bundle.conf\")
+set(Application "${OPATH}/${PROJECT_NAME}.exe")
+
+install(CODE "
+    file(WRITE \"${OPATH}/bundle_${PROJECT_NAME}.conf\")
     " COMPONENT Runtime)
-
 	
-INSTALL(CODE "
+set(Bin_Lookup_Directories 
+	${GRIS_BIN_DIR}	
+	${BOOST_LIB_DIR}	
+	)
+	
+install(CODE "
 	file(GLOB_RECURSE VAR_NAME
-      \"\${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+      \"${OPATH}/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
     include(BundleUtilities)
-    fixup_bundle(\"${APPS}\" \"\${VAR_NAME}\" \"${DIRS}\")
+    fixup_bundle(\"${Application}\" \"${VAR_NAME}\" \"${Bin_Lookup_Directories}\")
     " COMPONENT Runtime)

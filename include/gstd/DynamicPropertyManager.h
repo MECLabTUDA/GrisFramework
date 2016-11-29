@@ -2,37 +2,46 @@
 #define GRIS_DYNAMIC_PROPERTY_MANAGER_H
 
 #include "gstd_api.h"
-#include "dynamicProperty.h"
 
-#include <loki/Singleton.h>
+#include "XmlNode.h"
 
-#pragma warning ( push )
-#pragma warning ( disable: 4251 ) // no dll export for std::pair
+#include <string>
+#include <memory>
 
+namespace gris 
+{
+  class XmlDocument;
 
-namespace gris {
-  namespace gstd  // gris std
+  namespace gstd
   {   
+    class DynamicProperty;
+
     /**
     */
     class GRIS_GSTD_API DynamicPropertyManager
     {
       public:
-        DynamicPropertyManager() {}
-        ~DynamicPropertyManager() {}
+        DynamicPropertyManager();
+        ~DynamicPropertyManager();
 
-        void connectClass     (const std::string& classname, DynamicProperty& object);
-        void registerManager  (const std::string& filename, bool writeOnDisconnect=true);
+        DynamicPropertyManager(const DynamicPropertyManager&) = delete;
+        DynamicPropertyManager& operator =(const DynamicPropertyManager&) = delete;
+
+      public:
+        void initialize(const std::string& prefix = "root", const std::string& filename = "app_init.xml");
+        void connect   (const std::string& prefixes = "");
+        void disconnect();
+
+        void login(DynamicProperty& object, const std::string& prefixes = "");
 
       private:
-        std::pair<std::string, bool> file;      
+        std::string mFileName;
+        std::unique_ptr<XmlDocument> mpXml;
+        XmlNode mpBaseNode;
     };
 
-    typedef Loki::SingletonHolder<DynamicPropertyManager> TheDynamicPropertyManager;
+    GRIS_GSTD_API DynamicPropertyManager& GetDynamicPropertyManager();
   }
 }
 
-
-
-#pragma warning ( pop )
 #endif

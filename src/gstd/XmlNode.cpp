@@ -61,6 +61,14 @@ namespace gris
 
   /**
   */
+  XmlNode::XmlNode(XmlNode&& o) = default;
+
+  /**
+  */
+  XmlNode& XmlNode::operator=(XmlNode&& o) = default;
+
+  /**
+  */
   void XmlNode::setRoot(pugi::xml_node& root)
   {
     mp->node = root;
@@ -96,12 +104,23 @@ namespace gris
     node.mp->node = mp->node.child(name);
     if (node.mp->node.empty())
     {
-      std::cout << *this << endl;
+      std::cout << "could not find child with name " << name << endl;
       throw XmlException(XmlException::ChildNotFound);
     }
     return node;
   }
 
+  /**
+  */  
+  bool XmlNode::hasChild(const char* name)
+  {
+    XmlNode node;
+    node.mp->node = mp->node.child(name);
+    if (node.mp->node.empty())
+      return false;
+    else
+      return true;
+  }
 
   /**
   */
@@ -135,6 +154,23 @@ namespace gris
   {
     mp->node.set_value(val);
     mp->node.append_child(pugi::node_pcdata).set_value(val);
+  }
+
+  /**
+  */
+  void XmlNode::setName(const char* val)
+  {
+    if (mp->node.set_name(val))
+    {
+      mp->name = val;
+    }
+  }
+  
+  /**
+  */
+  const char* XmlNode::getName() const
+  {
+    return mp->name.c_str();
   }
 
   /**
