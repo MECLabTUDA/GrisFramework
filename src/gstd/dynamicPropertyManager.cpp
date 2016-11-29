@@ -132,9 +132,6 @@ namespace
   */
   void proceedNode(XmlNode& node, const std::vector<std::string>& tokens)
   {
-    std::cout << "start " << node.getName() << std::endl;
-    for (auto token : tokens)
-      std::cout << "   " <<  token << std::endl;    
     for (int i(0); i<(int)tokens.size(); ++i)
     {
       if (node.hasChild(tokens[i].c_str()))
@@ -146,7 +143,6 @@ namespace
         node = node.addChild(tokens[i].c_str());
       }
     }
-    std::cout << "end " << node.getName() << std::endl;
   }
 
   /**

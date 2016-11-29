@@ -20,8 +20,8 @@ namespace gris {
     class GRIS_GSTD_API IProperty
     {
       public:
-        IProperty() {}
-        virtual ~IProperty() {}
+        IProperty();
+        virtual ~IProperty();
 
 	    public:
 		    /** \brief Set the value of the parameter. The value is taken in as a string, but converted to the type of that parameter. */
@@ -107,6 +107,11 @@ namespace gris {
       public:
         DynamicProperty() {}
         ~DynamicProperty() {}
+
+        DynamicProperty(const DynamicProperty&) {}
+        DynamicProperty& operator=(const DynamicProperty&) { return *this; }
+        DynamicProperty(DynamicProperty&&) {}
+        DynamicProperty& operator=(DynamicProperty&&) { return *this; }
         
       public:
         /** \brief This function declares a parameter \e name, and specifies the \e setter and \e getter functions. */

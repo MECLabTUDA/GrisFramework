@@ -54,7 +54,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${MODULE_NAME})
 # ---------- post build and install
 
 set(IPATH ${CMAKE_BINARY_DIR}/src/)
-set(OPATH ${CMAKE_INSTALL_PREFIX}/bin/)
+set(OPATH ${CMAKE_INSTALL_PREFIX}/apps/)
 
 file(MAKE_DIRECTORY ${OPATH})
 

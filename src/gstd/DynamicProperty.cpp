@@ -12,6 +12,19 @@ namespace gris
   {
     /**
     */
+    IProperty::IProperty()
+    {
+    }
+
+    /**
+    */
+    IProperty::~IProperty() 
+    {
+    }
+
+
+    /**
+    */
     const std::string& IProperty::truthValueTo01Str(const std::string& value)
     {
       static const std::string falseValue = "0"; // boost::lexical_cast can only cast "0" to (bool) false 
