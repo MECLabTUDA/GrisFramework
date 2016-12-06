@@ -1,0 +1,11 @@
+include(BundleUtilities)
+
+set(ApplicationList "@_BUNDLE_APPLICATION_LIST@")
+set(LookupDirectories "@_BUNDLE_LOOKUP_DIRECTORIES@")
+
+@_BUNDLE_APPLICATION_FILE_DEFINITIONS@
+@_BUNDLE_DYNAMIC_LIB_DEFINITIONS@
+
+foreach(app IN LISTS ApplicationList)
+  fixup_bundle("${${app}_file}" "${${app}_dynamic_libs}" "${LookupDirectories}")
+endforeach()

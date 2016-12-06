@@ -1,17 +1,5 @@
 project(gstd)
 
-include_directories(
-	${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/
-	${BOOST_INCLUDE_DIR}
-	${LOKI_INCLUDE_DIR}
-	${PUGI_INCLUDE_DIR}
-	)
-
-link_directories(
-	${BOOST_LIB_DIR}
-	${PUGI_LIB_DIR}
-)
-
 set(INC_DIR
 	${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/)
 
@@ -22,6 +10,7 @@ set(Includes
 	${INC_DIR}XmlAttribute.h
 	${INC_DIR}DynamicProperty.h
 	${INC_DIR}DynamicPropertyManager.h
+  ${INC_DIR}InvokeLater.h
 	${INC_DIR}logger.h
 	${INC_DIR}GrisFileLogger.h
 	${INC_DIR}gstd_api.h
@@ -29,6 +18,7 @@ set(Includes
 set(Private_Includes
 	${INC_DIR}private/gris.pch
 	${INC_DIR}private/targetver.h
+  ${INC_DIR}resource.h
 	)	
 set(Sources	
 	DynamicProperty.cpp
@@ -40,21 +30,34 @@ set(Sources
 	XmlAttribute.cpp
 	Vector.cpp
 	)
-set(Resources
-	${INC_DIR}resource.rc
-	)	
 
-add_library(gstd SHARED
+set(Resources
+	${CMAKE_CURRENT_BINARY_DIR}/resource.rc
+	)	
+  
+add_library(${PROJECT_NAME} SHARED
 	${Includes}
 	${Private_Includes}
 	${Sources}
 	${Resources}
 	)
-	
-target_link_libraries( gstd	
-	pugixml
-	#${BOOST_FILESYSTEM_R}
+# public includes
+target_include_directories( ${PROJECT_NAME} PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+  )
+#private includes
+target_include_directories( ${PROJECT_NAME} PRIVATE
+	${BOOST_INCLUDE_DIR}
+	${LOKI_INCLUDE_DIR}
+	${PUGI_INCLUDE_DIR}
 	)
+	
+target_link_libraries( ${PROJECT_NAME}	PRIVATE
+	${PUGI_LIB_DIR}/pugixml.lib
+	${BOOST_LIB_DIR}/${BOOST_FILESYSTEM_R}
+	)
+message("boost 	${BOOST_LIB_DIR}/${BOOST_FILESYSTEM_R}")
 	
 source_group("Header Files\\private" FILES
 	${Private_Includes}
@@ -63,25 +66,22 @@ source_group("Resources" FILES
 	${Resources}
 	)
 
+# configure the resource file
+_gris_configure_resource_rc(GrisFramework std ${PROJECT_NAME})
+
+# add version information to output file name
+_gris_append_product_version(${PROJECT_NAME} GrisFramework)
+
 # ---------- post build 
-
-set(IPATH ${CMAKE_BINARY_DIR}/src/)
-set(OPATH ${CMAKE_INSTALL_PREFIX}/apps/)
-
-file(MAKE_DIRECTORY ${OPATH})
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-		${IPATH}${MODULE_NAME}/$<CONFIG>/${PROJECT_NAME}.dll		${OPATH})
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${IPATH}${MODULE_NAME}/$<CONFIG>/${PROJECT_NAME}.pdb		${OPATH})
+# is is using ${PROJECT_NAME}=gstd as target
+_gris_deploy_after_build(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
 
 # ---------- install
-install(TARGETS gstd RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/apps    )
 
-install(TARGETS gstd LIBRARY ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/ )
-install(TARGETS gstd RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/ )
-install(DIRECTORY ${INC_DIR} DESTINATION include/gstd
-		 FILES_MATCHING PATTERN "*.h"
-		 )
+install(TARGETS gstd EXPORT GrisFramework
+  LIBRARY ARCHIVE DESTINATION ${GrisFramework_LIB_INSTALL_DIR}
+  RUNTIME DESTINATION ${GrisFramework_BIN_INSTALL_DIR}
+  )
+install(FILES ${Includes} DESTINATION "include/gstd-${GrisFramework_SHORT_VERSION}" )
 		 
 	

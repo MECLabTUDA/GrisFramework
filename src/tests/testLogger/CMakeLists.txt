@@ -3,8 +3,8 @@ project(testLogger)
 set(INC_DIR ${CMAKE_SOURCE_DIR}/include/${MODULE_NAME}/${PROJECT_NAME}/)
 
 include_directories(
-	${INC_DIR}
-	${CMAKE_SOURCE_DIR}/include
+	$<BUILD_INTERFACE:${INC_DIR}>
+	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
 	${LOKI_INCLUDE_DIR}	
 	)
 
@@ -36,48 +36,27 @@ source_group("Header Files\\private" FILES
 	${Private_Includes}
 	)
 	
-source_group("Post-Build Files" FILES
-	${PROJECT_NAME}_deploy.bat
-	)
-	
 target_link_libraries(${PROJECT_NAME}
 	gstd
 	pugixml
 	${BOOST_LIBS}
 	)
-	
+
+# add version information to output file name
+_gris_append_product_version(${PROJECT_NAME} GrisFramework)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${MODULE_NAME})
-
-ADD_CUSTOM_COMMAND(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}_deploy.bat
-		${PROJECT_NAME}
-		${MODULE_NAME}
-		${CMAKE_BINARY_DIR}
-		${CMAKE_INSTALL_PREFIX}\\${MODULE_NAME}\\${PROJECT_NAME}
-	)
-
-SET(APPS "${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/${PROJECT_NAME}.exe")
-
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/tests/${PROJECT_NAME}/
-    BUNDLE DESTINATION /tests/${PROJECT_NAME} COMPONENT Runtime
-    RUNTIME DESTINATION /tests/${PROJECT_NAME} COMPONENT Runtime
-    )
 	
-SET(DIRS 
-	${BOOST_LIB_DIR}
-	${CMAKE_INSTALL_PREFIX}/gstd/
-	)	
-	
-INSTALL(CODE "
-    file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/test.conf\")
-    " COMPONENT Runtime)
+# ---------- post build
 
-	
-INSTALL(CODE "
-	file(GLOB_RECURSE VAR_NAME
-      \"\${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
-    include(BundleUtilities)
-    fixup_bundle(\"${APPS}\" \"\${VAR_NAME}\" \"${DIRS}\")
-    " COMPONENT Runtime)
+_gris_deploy_after_build(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
+
+# ---------- bundle and install
+
+_gris_bundle_target(${PROJECT_NAME})
+_gris_bundle_add_lookup_directories(${BOOST_LIB_DIR})
+
+install(TARGETS ${PROJECT_NAME} EXPORT GrisFramework
+  RUNTIME DESTINATION ${GrisFramework_Testing_BIN_INSTALL_DIR}
+  LIBRARY DESTINATION ${GrisFramework_Testing_LIB_INSTALL_DIR})
+  
