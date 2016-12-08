@@ -10,7 +10,7 @@ set(Includes
 	${INC_DIR}XmlAttribute.h
 	${INC_DIR}DynamicProperty.h
 	${INC_DIR}DynamicPropertyManager.h
-  ${INC_DIR}InvokeLater.h
+	${INC_DIR}InvokeLater.h
 	${INC_DIR}logger.h
 	${INC_DIR}GrisFileLogger.h
 	${INC_DIR}gstd_api.h
@@ -18,7 +18,7 @@ set(Includes
 set(Private_Includes
 	${INC_DIR}private/gris.pch
 	${INC_DIR}private/targetver.h
-  ${INC_DIR}resource.h
+	${INC_DIR}resource.h
 	)	
 set(Sources	
 	DynamicProperty.cpp
@@ -56,8 +56,8 @@ target_include_directories( ${PROJECT_NAME} PRIVATE
 target_link_libraries( ${PROJECT_NAME}	PRIVATE
 	${PUGI_LIB_DIR}/pugixml.lib
 	${BOOST_LIB_DIR}/${BOOST_FILESYSTEM_R}
+	${BOOST_LIB_DIR}/${BOOST_SYSTEM_R}
 	)
-message("boost 	${BOOST_LIB_DIR}/${BOOST_FILESYSTEM_R}")
 	
 source_group("Header Files\\private" FILES
 	${Private_Includes}
