@@ -15,7 +15,7 @@ elseif()
 endif()
 endmacro()
 
-macro(gris_configure_resource_rc GeneratedFile ProductName ProductSubName ModuleName)
+function(gris_configure_resource_rc GeneratedFile ProductName ProductSubName ModuleName)
 # ProductName being the top name,
 # ProductSubName being the Product Component name,
 # ModuleName being the "main target name"
@@ -36,4 +36,4 @@ if(WIN32)
   configure_file("${GrisFramework_CMAKE_DIR}/resource.rc.in" "resource.rc")
   set_source_files_properties("resource.rc" PROPERTIES GENERATED ON)
 endif()
-endmacro()
+endfunction()
