@@ -2,19 +2,21 @@ cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
 
 project(GrisFramework)
 
+# generate Version variables
+include(cmake/version.cmake)
+
 # set INSTALL dirs 
 set(GrisFramework_BIN_INSTALL_DIR "bin")
 set(GrisFramework_LIB_INSTALL_DIR "lib")
+set(GrisFramework_INCLUDE_INSTALL_DIR "include/GrisFramework-${GrisFramework_SHORT_VERSION}")
 set(GrisFramework_PACKAGE_INSTALL_DIR "lib/cmake/GrisFramework-${GrisFramework_SHORT_VERSION}")
 set(GrisFramework_Testing_BIN_INSTALL_DIR "tests")
 set(GrisFramework_Testing_LIB_INSTALL_DIR "tests/lib")
 
 set(GrisFramework_CMAKE_DIR "${CMAKE_SOURCE_DIR}/cmake/")
+set(GrisFramework_BUNDLE_DIR "${CMAKE_BINARY_DIR}/$<CONFIG>/bin")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GrisFramework_CMAKE_DIR})
-
-# generate Version variables
-include(cmake/version.cmake)
 
 # define _gris_deploy_after_build
 include(cmake/DeployAfter.cmake)
@@ -64,17 +66,23 @@ set(GrisFramework_MACROS_LIST_FULL )
 foreach(_file IN LISTS GrisFramework_MACROS_LIST)
   set(GrisFramework_MACROS_LIST_FULL ${GrisFramework_MACROS_LIST_FULL} "cmake/${_file}")
 endforeach()
+
+# install *.in files
 file(GLOB _DotInFiles               RELATIVE "${CMAKE_SOURCE_DIR}" "cmake/*.in")
-list(REMOVE_ITEM _DotInFiles GrisFrameworkConfig.cmake.in)
-list(REMOVE_ITEM _DotInFiles GrisFrameworkConfigVersion.cmake.in)
+list(REMOVE_ITEM _DotInFiles cmake/GrisFrameworkConfig.cmake.in)
+list(REMOVE_ITEM _DotInFiles cmake/GrisFrameworkConfigVersion.cmake.in)
 
 configure_file(cmake/GrisFrameworkConfig.cmake.in         GrisFrameworkConfig.cmake @ONLY)
 configure_file(cmake/GrisFrameworkConfigVersion.cmake.in  GrisFrameworkConfigVersion.cmake @ONLY)
 
-# install
+# install macros
 install(FILES ${GrisFramework_MACROS_LIST_FULL} ${_DotInFiles} DESTINATION "${GrisFramework_PACKAGE_INSTALL_DIR}/cmake")
+
 configure_file(cmake/GrisFrameworkConfig.cmake.in         cmake/GrisFrameworkConfig.cmake @ONLY)
 configure_file(cmake/GrisFrameworkConfigVersion.cmake.in  cmake/GrisFrameworkConfigVersion.cmake @ONLY)
+
+# install Config files
+install(FILES "${CMAKE_BINARY_DIR}/cmake/GrisFrameworkConfig.cmake" "${CMAKE_BINARY_DIR}/cmake/GrisFrameworkConfigVersion.cmake" DESTINATION "${GrisFramework_PACKAGE_INSTALL_DIR}")
 
 # create the bundle.cmake file in binary tree
 gris_bundle_configure_file()

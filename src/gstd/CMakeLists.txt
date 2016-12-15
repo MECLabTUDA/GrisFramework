@@ -34,8 +34,6 @@ set(Sources
 # configure the resource file
 gris_configure_resource_rc(Resources GrisFramework std ${PROJECT_NAME})
 
-# set(Resources ${CMAKE_CURRENT_BINARY_DIR}/resource.rc ) ## This is done by gris_configure_resource_rc
-  
 gris_boost_find_and_fix("1.59" COMPONENTS filesystem)
 
 add_library(${PROJECT_NAME} SHARED
@@ -47,7 +45,7 @@ add_library(${PROJECT_NAME} SHARED
 # public includes
 target_include_directories( ${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/>
-  $<INSTALL_INTERFACE:${GrisFramework_PACKAGE_INSTALL_DIR}>
+  $<INSTALL_INTERFACE:${GrisFramework_INCLUDE_INSTALL_DIR}>
   )
   
 #private includes
@@ -69,14 +67,14 @@ gris_append_product_version(${PROJECT_NAME} GrisFramework)
 
 # ---------- post build 
 # is is using ${PROJECT_NAME}=gstd as target
-gris_deploy_after_build(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
+gris_deploy_after_build(${PROJECT_NAME} "${GrisFramework_BUNDLE_DIR}")
 
 # ---------- install
 
 install(TARGETS gstd EXPORT GrisFramework
-  LIBRARY ARCHIVE DESTINATION ${GrisFramework_LIB_INSTALL_DIR}
-  RUNTIME DESTINATION ${GrisFramework_BIN_INSTALL_DIR}
+  LIBRARY ARCHIVE DESTINATION "${GrisFramework_LIB_INSTALL_DIR}"
+  RUNTIME DESTINATION "${GrisFramework_BIN_INSTALL_DIR}"
   )
-install(FILES ${Includes} DESTINATION "include/gstd-${GrisFramework_SHORT_VERSION}" )
+install(FILES ${Includes} DESTINATION "${GrisFramework_INCLUDE_INSTALL_DIR}/${PROJECT_NAME}" )
 		 
 	

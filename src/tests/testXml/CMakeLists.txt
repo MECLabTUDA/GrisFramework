@@ -44,7 +44,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${MODULE_NAME})
 
 # ---------- post build
 
-gris_deploy_after_build(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
+gris_deploy_after_build(${PROJECT_NAME} "${GrisFramework_BUNDLE_DIR}")
 
 # ---------- bundle and install
 

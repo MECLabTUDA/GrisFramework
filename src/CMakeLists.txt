@@ -9,9 +9,9 @@ if(BUILD_Testing)
   add_subdirectory(${MODULE_NAME})
   
   # install all libraries for tests
-  install(DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>/bin"
+  install(DIRECTORY "${GrisFramework_BUNDLE_DIR}/"
     DESTINATION             "tests"
-    FILES_MATCHING PATTERN  "*{CMAKE_SHARED_LIBRARY_SUFFIX}")
+    FILES_MATCHING PATTERN  "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
   # install automatically depends on a previously executes bundling operation...
 endif(BUILD_Testing)
 #Use solution folders.
@@ -19,4 +19,4 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(_exports_file "GrisFrameworkTargets.cmake")
 export(EXPORT GrisFramework FILE "cmake/${_exports_file}")
-install(EXPORT GrisFramework DESTINATION "lib/cmake/GrisFramework-${GrisFramework_SHORT_VERSION}" FILE "${_exports_file}")
+install(EXPORT GrisFramework DESTINATION "${GrisFramework_PACKAGE_INSTALL_DIR}" FILE "${_exports_file}")
