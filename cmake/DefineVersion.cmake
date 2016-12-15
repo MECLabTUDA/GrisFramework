@@ -1,4 +1,4 @@
-macro(_gris_define_version ProjectName Major Minor Patch Tweak)
+macro(gris_define_version ProjectName Major Minor Patch Tweak)
   set(${ProjectName}_VERSION_MAJOR    "${Major}")
   set(${ProjectName}_VERSION_MINOR    "${Minor}")
   set(${ProjectName}_VERSION_PATCH    "${Patch}")

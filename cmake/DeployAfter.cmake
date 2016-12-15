@@ -1,4 +1,4 @@
-macro(_gris_deploy_after_build target dest)
+macro(gris_deploy_after_build target dest)
 # dest can include generator extressions
 
 # make the folder
@@ -6,15 +6,9 @@ macro(_gris_deploy_after_build target dest)
 # copy the files
   add_custom_command(TARGET ${target} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "$<TARGET_FILE:${target}>" "${dest}" 
+      "$<TARGET_FILE:${target}>" "$<TARGET_PDB_FILE:${target}>" "${dest}" 
+    COMMENT "Copying Target ${target} to deploy directory ${dest}"
     )
-  if(MSVC)
-  add_custom_command(TARGET ${target} POST_BUILD 
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      #"$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:-E copy_if_different 
-      "$<TARGET_FILE_DIR:${target}>/$<TARGET_PROPERTY:${target},OUTPUT_NAME>.pdb" "${dest}"#>"  
-    )
-  endif()
   get_property(_DEPLOY_NAME TARGET ${target} PROPERTY OUTPUT_NAME)
   get_property(_DEPLOY_SUFFIX TARGET ${target} PROPERTY SUFFIX)
   if(NOT _DEPLOY_NAME)

@@ -31,10 +31,15 @@ set(Sources
 	Vector.cpp
 	)
 
+# configure the resource file
+gris_configure_resource_rc(GrisFramework std ${PROJECT_NAME})
+
 set(Resources
 	${CMAKE_CURRENT_BINARY_DIR}/resource.rc
-	)	
+	)
   
+gris_boost_find_and_fix("1.59" COMPONENTS filesystem)
+
 add_library(${PROJECT_NAME} SHARED
 	${Includes}
 	${Private_Includes}
@@ -44,19 +49,14 @@ add_library(${PROJECT_NAME} SHARED
 # public includes
 target_include_directories( ${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/>
-  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+  $<INSTALL_INTERFACE:${GrisFramework_PACKAGE_INSTALL_DIR}>
   )
+  
 #private includes
-target_include_directories( ${PROJECT_NAME} PRIVATE
-	${BOOST_INCLUDE_DIR}
-	${LOKI_INCLUDE_DIR}
-	${PUGI_INCLUDE_DIR}
-	)
-	
 target_link_libraries( ${PROJECT_NAME}	PRIVATE
-	${PUGI_LIB_DIR}/pugixml.lib
-	${BOOST_LIB_DIR}/${BOOST_FILESYSTEM_R}
-	${BOOST_LIB_DIR}/${BOOST_SYSTEM_R}
+	pugixml
+  Boost::filesystem
+  LOKI
 	)
 	
 source_group("Header Files\\private" FILES
@@ -66,15 +66,12 @@ source_group("Resources" FILES
 	${Resources}
 	)
 
-# configure the resource file
-_gris_configure_resource_rc(GrisFramework std ${PROJECT_NAME})
-
 # add version information to output file name
-_gris_append_product_version(${PROJECT_NAME} GrisFramework)
+gris_append_product_version(${PROJECT_NAME} GrisFramework)
 
 # ---------- post build 
 # is is using ${PROJECT_NAME}=gstd as target
-_gris_deploy_after_build(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
+gris_deploy_after_build(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
 
 # ---------- install
 

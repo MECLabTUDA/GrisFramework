@@ -1,11 +1,6 @@
 project(testDynamicProperty)
 
 set(INC_DIR ${CMAKE_SOURCE_DIR}/include/${MODULE_NAME}/${PROJECT_NAME}/)
-
-link_directories(
-	${PUGI_LIB_DIR}
-	${BOOST_LIB_DIR}
-)
 	
 set(Private_Includes
 	${INC_DIR}private/test.pch
@@ -27,6 +22,8 @@ source_group("Header Files\\private" FILES
 	${Private_Includes}
 	)
 	
+gris_boost_find_and_fix("1.59" COMPONENTS filesystem unit_test_framework)
+
 add_executable(${PROJECT_NAME}
 	${Private_Includes}
 	${Includes}
@@ -36,28 +33,26 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${INC_DIR}>
 	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-	${LOKI_INCLUDE_DIR}	
-	${BOOST_INCLUDE_DIR}
 	)
 	
 target_link_libraries(${PROJECT_NAME}
 	gstd
-	${BOOST_LIBS}
+  Boost::filesystem
+	Boost::unit_test_framework
 	)
 
 # add version information to output file name
-_gris_append_product_version(${PROJECT_NAME} GrisFramework)
+gris_append_product_version(${PROJECT_NAME} GrisFramework)
 	
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${MODULE_NAME})
 
 # ---------- post build
 
-_gris_deploy_after_build(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
+gris_deploy_after_build(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/$<CONFIG>/bin)
 
 # ---------- bundle and install
 
-_gris_bundle_target(${PROJECT_NAME})
-_gris_bundle_add_lookup_directories(${BOOST_LIB_DIR})
+gris_bundle_target(${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME} EXPORT GrisFramework
   RUNTIME DESTINATION ${GrisFramework_Testing_BIN_INSTALL_DIR}
