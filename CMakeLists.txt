@@ -42,15 +42,14 @@ option(BUILD_Testing "enable tests" OFF)
 
 
 set(Boost_NO_BOOST_CMAKE ON)
-set(BOOST_ROOT "C:/Programs/boost_1_59_0")
-set(BOOST_LIBRARYDIR "C:/Programs/boost_1_59_0/lib32-msvc-14.0")
+set(BOOST_ROOT "${SDK_BASEPATH}/boost_1_59_0" CACHE PATH "Boost root directory")
+set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib32-msvc-14.0"  CACHE PATH "Boost library directory")
+mark_as_advanced(BOOST_LIBRARYDIR)
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_DEBUG_RUNTIME OFF)
 # set(Boost_DEBUG ON)
 
 gris_boost_find_and_fix("1.59")
-# find_package(Boost "1.59")
-# gris_boost_fix_map_imported_config(Boost::boost) # this fixes linking to Release instead of debug
 
 find_package(LOKI)
 
