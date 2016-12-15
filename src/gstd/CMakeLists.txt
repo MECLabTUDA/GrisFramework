@@ -32,11 +32,9 @@ set(Sources
 	)
 
 # configure the resource file
-gris_configure_resource_rc(GrisFramework std ${PROJECT_NAME})
+gris_configure_resource_rc(Resources GrisFramework std ${PROJECT_NAME})
 
-set(Resources
-	${CMAKE_CURRENT_BINARY_DIR}/resource.rc
-	)
+# set(Resources ${CMAKE_CURRENT_BINARY_DIR}/resource.rc ) ## This is done by gris_configure_resource_rc
   
 gris_boost_find_and_fix("1.59" COMPONENTS filesystem)
 
