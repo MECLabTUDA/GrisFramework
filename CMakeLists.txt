@@ -55,11 +55,6 @@ find_package(LOKI)
 
 gris_pugixml_find_and_fix()
 
-set(PUGI_INCLUDE_DIR "${SDK_BASEPATH}/pugixml-1.7/include" CACHE STRING "specifies the pugi include directory")
-set(PUGI_LIB_DIR "${SDK_BASEPATH}/pugixml-1.7/lib" CACHE STRING "specifies the pugi lib directory")
-# set(LOKI_INCLUDE_DIR "${SDK_BASEPATH}/loki-0.1.7" CACHE STRING "specifies the loki include directory")
-
-
 add_subdirectory(src)
 
 file(GLOB GrisFramework_MACROS_LIST RELATIVE "${GrisFramework_CMAKE_DIR}" "cmake/*.cmake")
