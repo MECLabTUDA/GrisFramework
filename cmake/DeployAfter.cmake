@@ -27,7 +27,7 @@ endfunction()
 function(gris_deploy_files target dest)
 # gris_deploy_files deploys additional files into the specified destination folder (dest). The deployment
 # of these files is attached to the target passed. This function does not install these files in the install 
-# target. Call this multiple times for different sub-folder. The folder will be created.
+# target. Call this multiple times for different sub-folders. The folder will be created.
 #
 # ARGUMENTS
 # gris_deploy_files(target dest file1 [file2 [...]])
@@ -44,5 +44,27 @@ function(gris_deploy_files target dest)
       )
   else()
     message(WARNING "Calling gris_deploy_files() without any files to copy...")
+  endif()
+endfunction()
+
+function(gris_deploy_directories target dest)
+# gris_deploy_directories deploys additional directories into the specified destination folder (dest). The 
+# deployment of these directories is attached to the target passed. This function does not install these 
+# directories in the install target. Call this multiple times for different sub-folders. The folder will 
+# be created.
+#
+# ARGUMENTS
+# gris_deploy_directories(target dest directory1 [directory2 [...]])
+
+  if(${ARGC} GREATER 2)
+
+  # copy the files
+    add_custom_command(TARGET ${target} POST_BUILD 
+      COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${ARGN} "${dest}" 
+      COMMENT "Copying Directories ($<JOIN:${ARGN},$<COMMA> >) for ${target} to deploy directory ${dest}"
+      )
+  else()
+    message(WARNING "Calling gris_deploy_directories() without any directories to copy...")
   endif()
 endfunction()
