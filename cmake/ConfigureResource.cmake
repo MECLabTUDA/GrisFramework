@@ -31,9 +31,21 @@ if(WIN32)
   set("_FILE_NAME"        ${ModuleName})
   set("_PRODUCT_NAME"     ${ProductName})
   set("_PRODUCT_SUB_NAME" ${ProductSubName})
-  set(${GeneratedFile} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc" PARENT_SCOPE)
+  set(_HEADERFILE)
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/resource.h")
+    set(_HEADERFILE "resource.h")
+    file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/resource.h" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+  elseif(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/resource.h")
+    # What to do, if we have a resource.h in include directories?
+    # --> use file(COPY ...) to copy the file manually
+    message(STATUS [=[No resource.h in CURRENT_BINARY_DIR or CURRENT_SOURCE_DIR found, using gstd default file!
+    To use a different resource.h-file, place it in CURRENT_SOURCE_DIR or file(COPY ...) it to CURRENT_BINARY_DIR.
+    ]=])
+    file(COPY "${GrisFramework_CMAKE_DIR}/resource.h" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+  endif()
+  set(${GeneratedFile} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc" ${_HEADERFILE} PARENT_SCOPE)
   
   configure_file("${GrisFramework_CMAKE_DIR}/resource.rc.in" "resource.rc")
-  set_source_files_properties("resource.rc" PROPERTIES GENERATED ON)
+  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/resource.rc" PROPERTIES GENERATED ON)
 endif()
 endfunction()

@@ -68,15 +68,16 @@ foreach(_file IN LISTS GrisFramework_MACROS_LIST)
 endforeach()
 
 # install *.in files
-file(GLOB _DotInFiles               RELATIVE "${CMAKE_SOURCE_DIR}" "cmake/*.in")
-list(REMOVE_ITEM _DotInFiles cmake/GrisFrameworkConfig.cmake.in)
-list(REMOVE_ITEM _DotInFiles cmake/GrisFrameworkConfigVersion.cmake.in)
+file(GLOB AdditionalFiles               RELATIVE "${CMAKE_SOURCE_DIR}" "cmake/*.in")
+list(REMOVE_ITEM AdditionalFiles cmake/GrisFrameworkConfig.cmake.in)
+list(REMOVE_ITEM AdditionalFiles cmake/GrisFrameworkConfigVersion.cmake.in)
+set(AdditionalFiles ${AdditionalFiles} "cmake/resource.h")
 
 configure_file(cmake/GrisFrameworkConfig.cmake.in         GrisFrameworkConfig.cmake @ONLY)
 configure_file(cmake/GrisFrameworkConfigVersion.cmake.in  GrisFrameworkConfigVersion.cmake @ONLY)
 
 # install macros
-install(FILES ${GrisFramework_MACROS_LIST_FULL} ${_DotInFiles} DESTINATION "${GrisFramework_PACKAGE_INSTALL_DIR}/cmake")
+install(FILES ${GrisFramework_MACROS_LIST_FULL} ${AdditionalFiles} DESTINATION "${GrisFramework_PACKAGE_INSTALL_DIR}/cmake")
 
 configure_file(cmake/GrisFrameworkConfig.cmake.in         cmake/GrisFrameworkConfig.cmake @ONLY)
 configure_file(cmake/GrisFrameworkConfigVersion.cmake.in  cmake/GrisFrameworkConfigVersion.cmake @ONLY)

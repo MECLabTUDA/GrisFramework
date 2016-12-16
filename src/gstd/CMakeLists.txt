@@ -18,7 +18,6 @@ set(Includes
 set(Private_Includes
 	${INC_DIR}private/gris.pch
 	${INC_DIR}private/targetver.h
-	${INC_DIR}resource.h
 	)	
 set(Sources	
 	DynamicProperty.cpp

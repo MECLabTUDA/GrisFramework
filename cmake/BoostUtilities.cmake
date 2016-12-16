@@ -31,13 +31,19 @@ function(_gris_boost_fix_map_imported_config)
   endif()
 endfunction()
 
-macro(gris_boost_find_and_fix)
+function(gris_boost_find_and_fix)
 # gris_boost_find_and_fix() calls find_package("Boost" ${ARGN}) and follows that up with a call to 
+# fix the mapped import configs (that is using minsizerel and relwithdebinfo). Imported Boost Library
+# Targets are also provided in the Variable BOOST_LIBRARIES. (internal Boost dependencies are not resolved 
+# for BOOST_LIBRARIES, but they are implicitly handled by CMAKE)
+#
+# ARGUMENTS
+# gris_boost_find_and_fix([vars]) --> vars are passed through to find_package, use find_package syntax
+
   find_package("Boost" ${ARGN})
-  _gris_boost_fix_map_imported_config("Boost::boost")
+  set(_complist "Boost::boost")
   set(_args ${ARGN})
   if("COMPONENTS" IN_LIST _args)
-    set(_complist)
     set(_arglist "EXACT" "QUIET" "REQUIRED" "CONFIG" "NO_MODULE" "NO_POLICY_SCOPE" 
       "NAMES" "CONFIGS" "HINTS" "PATHS" "PATH_SUFFIXES" "NO_DEFAULT_PATH" "NO_CMAKE_ENVIRONMENT_PATH"
       "NO_CMAKE_PATH" "NO_SYSTEM_ENVIRONMENT_PATH" "NO_CMAKE_PACKAGE_REGISTRY" "NO_CMAKE_BUILDS_PATH" 
@@ -53,6 +59,9 @@ macro(gris_boost_find_and_fix)
       endif()
       list(APPEND _complist "Boost::${_c_arg}")
     endforeach()
-    _gris_boost_fix_map_imported_config(${_complist})
   endif()
-endmacro()
+  _gris_boost_fix_map_imported_config(${_complist})
+  set(_complist ${BOOST_LIBRARIES} ${_complist})
+  list(REMOVE_DUPLICATES _complist)
+  set(BOOST_LIBRARIES ${_complist} PARENT_SCOPE)
+endfunction()
