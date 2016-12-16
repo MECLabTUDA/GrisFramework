@@ -50,12 +50,12 @@ function(gris_bundle_target target)
   
 endfunction()
 
-function(gris_bundle_add_lookup_directories dirs)
+function(gris_bundle_add_lookup_directories)
 # Add a lookup directory to the lookip directories of the bundle target.
 #
 # ARGUMENTS
-# gris_bundle_add_lookup_directories(path)
-  set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES "${dirs}")
+# gris_bundle_add_lookup_directories(path1 [path2 [...]])
+  set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES "${ARGN}")
 endfunction()
 
 function(gris_bundle_add_lookup_directories_config _conf dirs)
