@@ -14,14 +14,9 @@ function(gris_deploy_after_build target dest)
       "$<TARGET_FILE:${target}>" "$<TARGET_PDB_FILE:${target}>" "${dest}" 
     COMMENT "Copying Target ${target} to deploy directory ${dest}"
     )
-  get_property(_DEPLOY_NAME TARGET ${target} PROPERTY OUTPUT_NAME)
-  get_property(_DEPLOY_SUFFIX TARGET ${target} PROPERTY SUFFIX)
-  if(NOT _DEPLOY_NAME)
-    get_property(_DEPLOY_NAME TARGET ${target} PROPERTY NAME)
-  endif()
-  
+
 # TYPE STATIC_LIBRARY, MODULE_LIBRARY, SHARED_LIBRARY, INTERFACE_LIBRARY, EXECUTABLE
-  set_property(TARGET ${target} PROPERTY DEPLOY_NAME "${dest}/${_DEPLOY_NAME}")
+  set_property(TARGET ${target} PROPERTY DEPLOY_DIRECTORY "${dest}")
 endfunction()
 
 function(gris_deploy_files target dest)

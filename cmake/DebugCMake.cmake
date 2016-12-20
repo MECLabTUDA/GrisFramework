@@ -12,7 +12,7 @@ macro(gris_debug_print_vars)
 endmacro()
 
 # Get all propreties that cmake supports
-execute_process(COMMAND cmake --help-property-list OUTPUT_VARIABLE CMAKE_TARGET_PROPERTY_LIST)
+execute_process(COMMAND ${CMAKE_COMMAND} --help-property-list OUTPUT_VARIABLE CMAKE_TARGET_PROPERTY_LIST)
 
 # Convert command output into a CMake list
 STRING(REGEX REPLACE ";" "\\\\;" CMAKE_TARGET_PROPERTY_LIST "${CMAKE_TARGET_PROPERTY_LIST}")
@@ -53,6 +53,12 @@ function(gris_debug_print_properties)
 endfunction(gris_debug_print_properties)
 
 function(gris_debug_print_target _target)
+# gris_debug_print_target is a helper function to help debug targets. It will automatically 
+# print all properties of a target that are returned by `cmake --help-property-list`. Additionally
+# custom properties also passed to gris_debug_print_target will be retrieved and printed.
+#
+# ARGUMENTS
+# gris_debug_print_target(target [additional_properties [...]])
   if(NOT TARGET ${_target})
     message("There is no target named '${_target}'")
     return()
@@ -63,7 +69,9 @@ function(gris_debug_print_target _target)
   if(${_target_type} MATCHES "^INTERFACE_")
     set(_interface ON)
   endif()
-  foreach (_prop ${CMAKE_TARGET_PROPERTY_LIST})
+  set(_property_list ${CMAKE_TARGET_PROPERTY_LIST} ${ARGN})
+  list(SORT _property_list)
+  foreach (_prop ${_property_list})
     if(NOT ${_interface} OR ${_prop} IN_LIST CMAKE_TARGET_PROPERTY_WHITELIST)
       if(${_prop} MATCHES "<CONFIG>")
         foreach(_config IN LISTS CMAKE_CONFIGURATION_TYPES)

@@ -29,7 +29,13 @@ function(gris_bundle_target target)
 
   # bundle addition to target properties
   set_property(TARGET BUNDLE APPEND PROPERTY APPLICATION_LIST ${target})
-  set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file $<TARGET_FILE:${target}>)")
+
+  get_property(_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
+  if(_DEPLOY_DIRECTORY)
+    set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"${_DEPLOY_DIRECTORY}/$<TARGET_FILE_NAME:${target}>\")")
+  else()
+    set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"$<TARGET_FILE:${target}>\")")
+  endif()
 
   if(${ARGC} GREATER 1)
     # additional dynamic Library dependencies
@@ -55,16 +61,20 @@ function(gris_bundle_add_lookup_directories)
 #
 # ARGUMENTS
 # gris_bundle_add_lookup_directories(path1 [path2 [...]])
-  set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES "${ARGN}")
+  foreach(_dir IN LISTS ARGN)
+    set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES "${_dir}")
+  endforeach()
 endfunction()
 
-function(gris_bundle_add_lookup_directories_config _conf dirs)
+function(gris_bundle_add_lookup_directories_config _conf)
 # Add a config-specific lookup directory to the lookip directories of the bundle target.
 #
 # ARGUMENTS
-# gris_bundle_add_lookup_directories_config(config path)
+# gris_bundle_add_lookup_directories_config(config path1 [path2 [...]])
   string(TOUPPER ${_conf} _conf)
-  set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES_${_conf} "${dirs}")
+  foreach(_dir IN LISTS ARGN)
+    set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES_${_conf} "${_dir}")
+  endforeach()
 endfunction()
 
 function(gris_bundle_configure_file)
@@ -98,23 +108,28 @@ function(gris_bundle_add_lookup_directories_from_imported_target target)
 #
 # ARGUMENTS
 # gris_bundle_add_lookup_directories_from_imported_target(target [config])
-  set(_prop IMPORTED_LOCATION)
+  set(_prop LOCATION)
   if(${ARGC} GREATER 1)
     set(_prop "${_prop}_${ARGV1}")
   endif()
   get_property(_propval TARGET ${target} PROPERTY ${_prop})
   get_filename_component(_dir "${_propval}" DIRECTORY)
-  gris_bundle_add_lookup_directories(${_dir})
+  if(${ARGC} GREATER 1)
+    gris_bundle_add_lookup_directories_config(${_dir} ${ARGV1})
+  else()
+    gris_bundle_add_lookup_directories(${_dir})
+  endif()
 endfunction()
 
 function(gris_bundle_add_library lib)
 # gris_bundle_add_library adds libraries to the lookup directories of the bundle target. It uses the 
-# information present in the targets PROPERTIES (i.e. DEPLOY_NAME from DeployAfter and 
+# information present in the targets PROPERTIES (i.e. DEPLOY_DIRECTORY from DeployAfter and 
 # _gris_deploy_after_build) or the IMPORTED_LOCATION of IMPORTED targets.
 # Internal targets (not IMPORTED) will use generator expressions. Non-targets will use the provided directory.
 #
 # ARGUMENTS
 # gris_bundle_add_library(lib)
+
   if(NOT TARGET ${lib})
     get_filename_component(_ext ${lib} EXT)
     if("${_ext}" STREQUAL "${CMAKE_SHARED_LIBRARY_SUFFIX}")
@@ -127,11 +142,10 @@ function(gris_bundle_add_library lib)
       ]=])
     endif()
   else()
-    get_property(_DEPLOY_NAME TARGET ${lib} PROPERTY DEPLOY_NAME)
-    if(_DEPLOY_NAME)
-      # use DEPOLY_NAME property
-      get_filename_component(_DEPLOY_NAME "${_DEPLOY_NAME}" DIRECTORY)
-      gris_bundle_add_lookup_directories("${_DEPLOY_NAME}")
+    get_property(_DEPLOY_DIRECTORY TARGET ${lib} PROPERTY DEPLOY_DIRECTORY)
+    if(_DEPLOY_DIRECTORY)
+      # use DEPLOY_DIRECTORY property
+      gris_bundle_add_lookup_directories("${_DEPLOY_DIRECTORY}")
     else()
       get_property(_IMPORTED TARGET ${lib} PROPERTY IMPORTED)
       if(_IMPORTED AND ${_IMPORTED})
