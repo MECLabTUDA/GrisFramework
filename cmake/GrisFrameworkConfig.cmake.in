@@ -1,0 +1,27 @@
+# - Config file for the GrisFramework package
+# It defines the following variables
+#  GrisFramework_INCLUDE_DIRS - include directories for GrisFramework
+#  GrisFramework_LIBRARIES    - libraries to link against
+#  GrisFramework_EXECUTABLE   - the executables included in GrisFramework
+
+cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
+
+get_filename_component(GrisFramework_PACKAGE_DIR  "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+get_filename_component(_TEMP                    "${GrisFramework_PACKAGE_DIR}" PATH)
+get_filename_component(GrisFramework_LIB_DIR    "${_TEMP}"                   PATH)
+get_filename_component(GrisFramework_BASE_DIR   "${GrisFramework_LIB_DIR}"   PATH)
+
+set(GrisFramework_BIN_DIR     "${GrisFramework_BASE_DIR}/bin")
+set(GrisFramework_INCLUDE_DIR "${GrisFramework_BASE_DIR}/include")
+
+include("${GrisFramework_PACKAGE_DIR}/GrisFrameworkTargets.cmake")
+
+set(GrisFramework_CMAKE_DIR "${GrisFramework_PACKAGE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${GrisFramework_CMAKE_DIR}")
+
+set(GrisFramework_MACROS_LIST "@GrisFramework_MACROS_LIST@")
+
+foreach(_file IN LISTS GrisFramework_MACROS_LIST)
+  include("${GrisFramework_CMAKE_DIR}/${_file}")
+endforeach()
