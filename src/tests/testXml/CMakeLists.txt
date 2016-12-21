@@ -5,13 +5,7 @@ set(INC_DIR ${CMAKE_SOURCE_DIR}/include/${MODULE_NAME}/${PROJECT_NAME}/)
 include_directories(
 	${INC_DIR}
 	${CMAKE_SOURCE_DIR}/include
-	${LOKI_INCLUDE_DIR}
 	)
-
-link_directories(
-	${PUGI_LIB_DIR}
-	${BOOST_LIB_DIR}
-)
 
 	
 set(Includes
@@ -22,18 +16,13 @@ set(Private_Includes
 set(Sources
 	${PROJECT_NAME}.cpp
 	)
-set(Files
-	${PROJECT_NAME}_deploy.bat
-	)
 	
 source_group("Header Files\\private" FILES
 	${Private_Includes}
 	)
 	
-source_group("Post-Build Files" FILES
-	${PROJECT_NAME}_deploy.bat
-	)
-
+gris_boost_find_and_fix("1.59" COMPONENTS filesystem)
+  
 add_executable(${PROJECT_NAME}
 	${Private_Includes}
 	${Includes}
@@ -44,42 +33,27 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
 	gstd
 	pugixml
-	${BOOST_LIBS}
+	Boost::filesystem
+  LOKI
 	)
-	
+
+# add version information to output file name
+gris_append_product_version(${PROJECT_NAME} GrisFramework)
+
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${MODULE_NAME})
 
-ADD_CUSTOM_COMMAND(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${PROJECT_SOURCE_DIR}/${PROJECT_NAME}_deploy.bat
-		${PROJECT_NAME}
-		${MODULE_NAME}
-		${CMAKE_BINARY_DIR}
-		${CMAKE_INSTALL_PREFIX}\\${MODULE_NAME}\\${PROJECT_NAME}
-	)
+# ---------- post build
 
-SET(APPS "${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/${PROJECT_NAME}.exe")
+gris_deploy_after_build(${PROJECT_NAME} "${GrisFramework_BUNDLE_DIR}")
 
-install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/tests/${PROJECT_NAME}/
-    BUNDLE DESTINATION /tests/${PROJECT_NAME} COMPONENT Runtime
-    RUNTIME DESTINATION /tests/${PROJECT_NAME} COMPONENT Runtime
-    )
-	
-SET(DIRS 
-	${BOOST_LIB_DIR}
-	${XERCES_BIN_DIR}
-	${CMAKE_INSTALL_PREFIX}/gstd/
-	)	
-	
-INSTALL(CODE "
-    file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/test.conf\")
-    " COMPONENT Runtime)
+# ---------- bundle and install
 
-	
-INSTALL(CODE "
-	file(GLOB_RECURSE VAR_NAME
-      \"\${CMAKE_INSTALL_PREFIX}/${MODULE_NAME}/${PROJECT_NAME}/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
-    include(BundleUtilities)
-    fixup_bundle(\"${APPS}\" \"\${VAR_NAME}\" \"${DIRS}\")
-    " COMPONENT Runtime)
+gris_bundle_target(${PROJECT_NAME})
+
+
+add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+
+install(TARGETS ${PROJECT_NAME} EXPORT GrisFramework
+  RUNTIME DESTINATION ${GrisFramework_Testing_BIN_INSTALL_DIR}
+  LIBRARY DESTINATION ${GrisFramework_Testing_LIB_INSTALL_DIR})
+  
