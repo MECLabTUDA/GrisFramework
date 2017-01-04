@@ -93,11 +93,10 @@ function(gris_bundle_target target)
   if(_DEPLOY_DIRECTORY)
     set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"${_DEPLOY_DIRECTORY}/$<TARGET_FILE_NAME:${target}>\")")
     gris_bundle_add_lookup_directories(${_DEPLOY_DIRECTORY})
-    gris_bundle_clean_target_add(${_DEPLOY_DIRECTORY})
   else()
     set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"$<TARGET_FILE:${target}>\")")
-    gris_bundle_clean_target_add(${target})
   endif()
+  gris_bundle_clean_target_add(${target})
 
   if(${ARGC} GREATER 1)
     # additional dynamic Library dependencies
@@ -114,6 +113,7 @@ function(gris_bundle_target target)
   gris_get_dependent_libraries(_dep_targets ${target} TYPE SHARED_LIBRARY)
   foreach(_lib IN LISTS _dep_targets)
     gris_bundle_add_library(${_lib})
+    gris_bundle_clean_target_add(${_lib})
   endforeach()
   
 endfunction()
@@ -169,8 +169,8 @@ function(gris_bundle_configure_file)
   foreach(_t IN LISTS _TARGETS)
     set(directories ${directories} "$<TARGET_FILE_DIR:${_t}>")
   endforeach()
-  configure_file("${GrisFramework_CMAKE_DIR}/clear_bundle.cmake.in" "cmake/clear_bundle.cmake.in" @ONLY)
-  file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/cmake_clean_bundle.$<CONFIG>.cmake" INPUT "${CMAKE_BINARY_DIR}/cmake/clear_bundle.cmake.in")
+  configure_file("${GrisFramework_CMAKE_DIR}/clean_bundle.cmake.in" "cmake/clean_bundle.cmake.in" @ONLY)
+  file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/cmake_clean_bundle.$<CONFIG>.cmake" INPUT "${CMAKE_BINARY_DIR}/cmake/clean_bundle.cmake.in")
   
   add_custom_command(TARGET CLEAN_BUNDLE PRE_BUILD 
     COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/cmake_clean_bundle.$<CONFIG>.cmake"
