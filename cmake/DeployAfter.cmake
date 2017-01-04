@@ -32,7 +32,7 @@ function(gris_deploy_files target dest)
   get_property(_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
   if(NOT _DEPLOY_DIRECTORY)
     message(WARNING [=[using gris_deploy_files() without previously using gris_deploy_after_build() on the same 
-    target may lead to unexpected results for the CLEAR_BUNDLE TARGET.]=])
+    target may lead to unexpected results for the CLEAN_BUNDLE TARGET.]=])
   endif()
 
   if(${ARGC} GREATER 2)
@@ -65,7 +65,7 @@ function(gris_deploy_directories target dest)
   get_property(_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
   if(NOT _DEPLOY_DIRECTORY)
     message(WARNING [=[using gris_deploy_directories() without previously using gris_deploy_after_build() on the same 
-    target may lead to unexpected results for the CLEAR_BUNDLE TARGET.]=])
+    target may lead to unexpected results for the CLEAN_BUNDLE TARGET.]=])
   endif()
   
   if(${ARGC} GREATER 2)
