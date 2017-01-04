@@ -8,11 +8,70 @@ set_target_properties(BUNDLE
     LOOKUP_DIRECTORIES ""
     APPLICATION_FILE_DEFINITIONS ""
     DYNAMIC_LIB_DEFINITIONS "")
+    
+add_custom_target(CLEAR_BUNDLE ${CMAKE_COMMAND} -E echo "cleaning $<CONFIG>-BUNDLE directories..." )
+
+set_target_properties(CLEAR_BUNDLE
+  PROPERTIES
+    FOLDER CMakePredefinedTargets
+    DIRECTORIES ""
+    TARGETS "")
+
 foreach(_conf ${CMAKE_CONFIGURATION_TYPES})
   string(TOUPPER ${_conf} _upper_conf)
   set_target_properties(BUNDLE PROPERTIES LOOKUP_DIRECTORIES_${_upper_conf} "")
+  set_target_properties(CLEAR_BUNDLE PROPERTIES DIRECTORIES_${_upper_conf} "")
+  set_target_properties(CLEAR_BUNDLE PROPERTIES TARGETS_${_upper_conf} "")
 endforeach()
 
+function(gris_bundle_clear_target_add)
+# gris_bundle_clear_target adds a folder or a target to be deleted, if the clear target is built.
+#
+# ARGUMENTS
+# gris_bundle_clear_target_add(path|target [path|target ...])
+  set(_args ${ARGN})
+  LIST(REMOVE_DUPLICATES _args)
+  get_property(_DIRECTORIES TARGET CLEAR_BUNDLE PROPERTY DIRECTORIES)
+  foreach(_item IN LISTS _args)
+    if(TARGET ${_item})
+      get_property(_item_cleared TARGET ${_item} PROPERTY CLEAR_BUNDLE)
+      if(NOT ${_item_cleared})
+        set_property(TARGET CLEAR_BUNDLE APPEND PROPERTY TARGETS ${_item})
+        set_property(TARGET ${_item} PROPERTY CLEAR_BUNDLE TRUE)
+      endif()
+    elseif() # NOT TARGET
+      if(NOT ${_item} IN_LIST _DIRECTORIES)
+        set_property(TARGET CLEAR_BUNDLE APPEND PROPERTY DIRECTORIES ${_item})
+      endif()
+    endif()
+  endforeach()
+endfunction()
+    
+function(gris_bundle_clear_target_add_config _conf)
+# gris_bundle_clear_target_add_config adds a folder or a target to be deleted for a specific 
+# configuration only, if the clear target is built.
+#
+# ARGUMENTS
+# gris_bundle_clear_target_add_config(config path|target [path|target ...])
+  string(TOUPPER ${_conf} _conf)
+  set(_args ${ARGN})
+  LIST(REMOVE_DUPLICATES _args)
+  get_property(_DIRECTORIES TARGET CLEAR_BUNDLE PROPERTY DIRECTORIES_${_conf})
+  foreach(_item IN LISTS _args)
+    if(TARGET ${_item})
+      get_property(_item_cleared TARGET ${_item} PROPERTY CLEAR_BUNDLE_${_conf})
+      if(NOT ${_item_cleared})
+        set_property(TARGET CLEAR_BUNDLE APPEND PROPERTY TARGETS_${_conf} ${_item})
+        set_property(TARGET ${_item} PROPERTY CLEAR_BUNDLE_${_conf} TRUE)
+      endif()
+    elseif() # NOT TARGET
+      if(NOT ${_item} IN_LIST _DIRECTORIES)
+        set_property(TARGET CLEAR_BUNDLE APPEND PROPERTY DIRECTORIES_${_conf} ${_item})
+      endif()
+    endif()
+  endforeach()
+endfunction()
+    
 function(gris_bundle_target target)
 # gris_bundle_target will add target to the BUNDLE target add try to add all dependent 
 # libraries to the lookup_directories of the BUNDLE target. Additional dynamic libs, that are 
@@ -33,8 +92,11 @@ function(gris_bundle_target target)
   get_property(_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
   if(_DEPLOY_DIRECTORY)
     set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"${_DEPLOY_DIRECTORY}/$<TARGET_FILE_NAME:${target}>\")")
+    gris_bundle_add_lookup_directories(${_DEPLOY_DIRECTORY})
+    gris_bundle_clear_target_add(${_DEPLOY_DIRECTORY})
   else()
     set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"$<TARGET_FILE:${target}>\")")
+    gris_bundle_clear_target_add(${target})
   endif()
 
   if(${ARGC} GREATER 1)
@@ -82,6 +144,7 @@ function(gris_bundle_configure_file)
 # BUNDLE target execution. This should be the executed in the main CMakeLists.txt-file after all targets 
 # have been added and all bundles are declared. 
 # It creates a cmake_bundle.$<CONFIG>.cmake-file in the CMake Binary folder of the project for every configuration.
+# gris_bundle_configure_file also creates the CLEAN_BUNDLE target.
 #
 # ARGUMENTS
 # gris_bundle_configure_file()
@@ -98,6 +161,20 @@ function(gris_bundle_configure_file)
     COMMAND ${CMAKE_COMMAND} -P "cmake_bundle.$<CONFIG>.cmake" 
     COMMENT "Bundling all targets..."
     VERBATIM)
+  
+  get_property(directories TARGET CLEAR_BUNDLE PROPERTY DIRECTORIES)
+  list(REMOVE_DUPLICATES directories)
+  get_property(_TARGETS TARGET CLEAR_BUNDLE PROPERTY TARGETS)
+  list(REMOVE_DUPLICATES _TARGETS)
+  foreach(_t IN LISTS _TARGETS)
+    set(directories ${directories} "$<TARGET_FILE_DIR:${_t}>")
+  endforeach()
+  configure_file("${GrisFramework_CMAKE_DIR}/clear_bundle.cmake.in" "cmake/clear_bundle.cmake.in" @ONLY)
+  file(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/cmake_clear_bundle.$<CONFIG>.cmake" INPUT "${CMAKE_BINARY_DIR}/cmake/clear_bundle.cmake.in")
+  
+  add_custom_command(TARGET CLEAR_BUNDLE PRE_BUILD 
+    COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/cmake_clear_bundle.$<CONFIG>.cmake"
+    COMMENT "Clearing deploy folders")
 endfunction()
 
 function(gris_bundle_add_lookup_directories_from_imported_target target)

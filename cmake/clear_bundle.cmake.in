@@ -1,0 +1,6 @@
+set(directories "@directories@")
+
+foreach(dir IN LISTS directories)
+  message(STATUS "deleting ${dir}...")
+  file(REMOVE_RECURSE ${dir})
+endforeach()

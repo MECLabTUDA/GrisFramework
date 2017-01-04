@@ -17,6 +17,8 @@ function(gris_deploy_after_build target dest)
 
 # TYPE STATIC_LIBRARY, MODULE_LIBRARY, SHARED_LIBRARY, INTERFACE_LIBRARY, EXECUTABLE
   set_property(TARGET ${target} PROPERTY DEPLOY_DIRECTORY "${dest}")
+  set_property(TARGET ${target} PROPERTY DEPLOYED_DIRECTORIES "")
+#  set_property(TARGET ${target} PROPERTY DEPLOYED_FILES "")
 endfunction()
 
 function(gris_deploy_files target dest)
@@ -27,16 +29,25 @@ function(gris_deploy_files target dest)
 # ARGUMENTS
 # gris_deploy_files(target dest file1 [file2 [...]])
 
-  if(${ARGC} GREATER 2)
+  get_property(_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
+  if(NOT _DEPLOY_DIRECTORY)
+    message(WARNING [=[using gris_deploy_files() without previously using gris_deploy_after_build() on the same 
+    target may lead to unexpected results for the CLEAR_BUNDLE TARGET.]=])
+  endif()
 
+  if(${ARGC} GREATER 2)
+    set_property(TARGET ${target} APPEND PROPERTY DEPLOYED_DIRECTORIES ${dest})
+    if(NOT IS_ABSOLUTE ${dest})
+      set(dest "$<TARGET_PROPERTY:${target},DEPLOY_DIRECTORY>/${dest}")
+    endif()
   # make the folder
-    add_custom_command(TARGET ${target} PRE_LINK COMMAND ${CMAKE_COMMAND} -E make_directory "${dest}")
+      add_custom_command(TARGET ${target} PRE_LINK COMMAND ${CMAKE_COMMAND} -E make_directory "${dest}")
   # copy the files
-    add_custom_command(TARGET ${target} POST_BUILD 
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${ARGN} "${dest}" 
-      COMMENT "Copying Files ($<JOIN:${ARGN},$<COMMA> >) for ${target} to deploy directory ${dest}"
-      )
+      add_custom_command(TARGET ${target} POST_BUILD 
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          ${ARGN} "${dest}" 
+        COMMENT "Copying Files ($<JOIN:${ARGN},$<COMMA> >) for ${target} to deploy directory ${dest}"
+        )
   else()
     message(WARNING "Calling gris_deploy_files() without any files to copy...")
   endif()
@@ -51,9 +62,18 @@ function(gris_deploy_directories target dest)
 # ARGUMENTS
 # gris_deploy_directories(target dest directory1 [directory2 [...]])
 
+  get_property(_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
+  if(NOT _DEPLOY_DIRECTORY)
+    message(WARNING [=[using gris_deploy_directories() without previously using gris_deploy_after_build() on the same 
+    target may lead to unexpected results for the CLEAR_BUNDLE TARGET.]=])
+  endif()
+  
   if(${ARGC} GREATER 2)
-
-  # copy the files
+    set_property(TARGET ${target} APPEND PROPERTY DEPLOYED_DIRECTORIES ${dest})
+    if(NOT IS_ABSOLUTE ${dest})
+      set(dest "$<TARGET_PROPERTY:${target},DEPLOY_DIRECTORY>/${dest}")
+    endif()
+    # copy the files
     add_custom_command(TARGET ${target} POST_BUILD 
       COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${ARGN} "${dest}" 
