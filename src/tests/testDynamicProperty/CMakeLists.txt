@@ -48,12 +48,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER ${MODULE_NAME})
 
 # ---------- post build
 
-gris_deploy_after_build(${PROJECT_NAME} "${GrisFramework_BUNDLE_DIR}")
+gris_deploy(${PROJECT_NAME} "${GrisFramework_BIN_DIR}" "${GrisFramework_Testing_DIR}")
 
 # ---------- bundle and install
 
-gris_bundle_target(${PROJECT_NAME})
-
-install(TARGETS ${PROJECT_NAME} EXPORT GrisFramework
-  RUNTIME DESTINATION ${GrisFramework_Testing_BIN_INSTALL_DIR}
-  LIBRARY DESTINATION ${GrisFramework_Testing_LIB_INSTALL_DIR})
+gris_bundle(${PROJECT_NAME})

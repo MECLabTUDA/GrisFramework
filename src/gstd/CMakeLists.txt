@@ -66,14 +66,9 @@ gris_append_product_version(${PROJECT_NAME} GrisFramework)
 
 # ---------- post build 
 # is is using ${PROJECT_NAME}=gstd as target
-gris_deploy_after_build(${PROJECT_NAME} "${GrisFramework_BUNDLE_DIR}")
+gris_deploy(${PROJECT_NAME} "${GrisFramework_BIN_DIR}" "")
 
-# ---------- install
-
-install(TARGETS gstd EXPORT GrisFramework
-  LIBRARY ARCHIVE DESTINATION "${GrisFramework_LIB_INSTALL_DIR}"
-  RUNTIME DESTINATION "${GrisFramework_BIN_INSTALL_DIR}"
-  )
+# ---------- install includes
 install(FILES ${Includes} DESTINATION "${GrisFramework_INCLUDE_INSTALL_DIR}/${PROJECT_NAME}" )
 		 
 	

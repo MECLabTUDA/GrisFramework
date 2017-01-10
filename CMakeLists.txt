@@ -6,23 +6,23 @@ project(GrisFramework)
 include(cmake/version.cmake)
 
 # set INSTALL dirs 
-set(GrisFramework_BIN_INSTALL_DIR "bin")
-set(GrisFramework_LIB_INSTALL_DIR "lib")
+set(GrisFramework_BIN_DIR "bin")
+set(GrisFramework_LIB_DIR "lib")
 set(GrisFramework_INCLUDE_INSTALL_DIR "include/GrisFramework-${GrisFramework_SHORT_VERSION}")
 set(GrisFramework_PACKAGE_INSTALL_DIR "lib/cmake/GrisFramework-${GrisFramework_SHORT_VERSION}")
-set(GrisFramework_Testing_BIN_INSTALL_DIR "tests")
-set(GrisFramework_Testing_LIB_INSTALL_DIR "tests/lib")
+set(GrisFramework_Testing_DIR "tests")
 
 set(GrisFramework_CMAKE_DIR "${CMAKE_SOURCE_DIR}/cmake/")
-set(GrisFramework_BUNDLE_DIR "${CMAKE_BINARY_DIR}/$<CONFIG>/bin")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${GrisFramework_CMAKE_DIR})
 
-# define _gris_deploy_after_build
+set(GRIS_INSTALL_EXPORT "GrisFramework" CACHE INTERNAL "Export Name of the install")
+
+# define _gris_deploy
 include(cmake/DeployAfter.cmake)
 # define _gris_configure_resource_rc
 include(cmake/ConfigureResource.cmake)
-# define _gris_bundle_target
+# define _gris_bundle
 include(cmake/BundleTarget.cmake)
 # define _gris_*version
 include(cmake/TargetAppendVersion.cmake)
