@@ -48,6 +48,6 @@ if(WIN32)
   set(${GeneratedFile} "${CMAKE_CURRENT_BINARY_DIR}/resource.rc" ${_HEADERFILE} PARENT_SCOPE)
   
   configure_file("${GrisFramework_CMAKE_DIR}/resource.rc.in" "resource.rc")
-  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/resource.rc" PROPERTIES GENERATED ON)
+  set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/resource.rc" PROPERTIES)
 endif()
 endfunction()
