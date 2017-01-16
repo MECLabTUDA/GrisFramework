@@ -8,21 +8,23 @@ set_target_properties(BUNDLE
     LOOKUP_DIRECTORIES ""
     APPLICATION_FILE_DEFINITIONS ""
     DYNAMIC_LIB_DEFINITIONS "")
+
 foreach(_conf ${CMAKE_CONFIGURATION_TYPES})
   string(TOUPPER ${_conf} _upper_conf)
   set_target_properties(BUNDLE PROPERTIES LOOKUP_DIRECTORIES_${_upper_conf} "")
 endforeach()
-
-function(gris_bundle_target target)
-# gris_bundle_target will add target to the BUNDLE target add try to add all dependent 
+  
+function(gris_bundle target)
+# gris_bundle will add target to the BUNDLE target add try to add all dependent 
 # libraries to the lookup_directories of the BUNDLE target. Additional dynamic libs, that are 
 # dyamically loaded by the target may be added as addtional arguments. These will then bundled,
 # even if their dependency is not uncovered for the executable by the dependency walker.
 # Paths to dependening libraries will be added wherever possible, add additional paths with
-# gris_bundle_add_lookup_directories(path) and gris_bundle_add_lookup_directories_config(config path)
+# gris_bundle_add_lookup_directories(path) and gris_bundle_add_lookup_directories_config(config path).
+# gris_bundle will also invoke the appropriate install commands.
 # 
 # ARGUMENTS
-# gris_bundle_target(target [dynamic_lib1 [...]])
+# gris_bundle(target [dynamic_lib1 [...]])
 
   # bundle target dependency
   add_dependencies(BUNDLE ${target})
@@ -30,11 +32,25 @@ function(gris_bundle_target target)
   # bundle addition to target properties
   set_property(TARGET BUNDLE APPEND PROPERTY APPLICATION_LIST ${target})
 
-  get_property(_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
+  get_property(_MAIN_DEPLOY_SUBDIRECTORY  TARGET ${target} PROPERTY MAIN_DEPLOY_SUBDIRECTORY)
+  get_property(_DEPLOY_DIRECTORY  TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
+  get_property(_INSTALL_DIRECTORY TARGET ${target} PROPERTY INSTALL_DIRECTORY)
+  # prefix subfolder to the base folders
+  _gris_prefix_folder(deploy_dir "${_MAIN_DEPLOY_SUBDIRECTORY}" "${_DEPLOY_DIRECTORY}")
+  _gris_prefix_folder(deploy_dir "${deploy_dir}" "${CMAKE_BINARY_DIR}")
+  _gris_prefix_folder(install_dir "${_MAIN_DEPLOY_SUBDIRECTORY}" "${_INSTALL_DIRECTORY}")
   if(_DEPLOY_DIRECTORY)
-    set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"${_DEPLOY_DIRECTORY}/$<TARGET_FILE_NAME:${target}>\")")
+    # add file to apllication file definition
+    set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"${deploy_dir}$<TARGET_FILE_NAME:${target}>\")")
+    gris_bundle_add_lookup_directories(${deploy_dir})
+    # clean the main deployment directory
+    _gris_add_clean_directory("${deploy_dir}" "${install_dir}")
+    
   else()
     set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"$<TARGET_FILE:${target}>\")")
+    message(WARNING [=[using gris_bundle() without previously using gris_deploy() on the same target may lead to unexpected results for
+    the BUNDLE TARGET, specifically, the BUNDLE will be created in the build folder instead of the deploy folder and deployment via
+    gris_deploy will not work properly.]=])
   endif()
 
   if(${ARGC} GREATER 1)
@@ -53,7 +69,12 @@ function(gris_bundle_target target)
   foreach(_lib IN LISTS _dep_targets)
     gris_bundle_add_library(${_lib})
   endforeach()
-  
+  IF(GRIS_INSTALL_DEPLOYED)
+    # install all libraries for tests
+    install(DIRECTORY "${deploy_dir}/"
+      DESTINATION             "${install_dir}"
+      FILES_MATCHING PATTERN  "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  ENDIF(GRIS_INSTALL_DEPLOYED)
 endfunction()
 
 function(gris_bundle_add_lookup_directories)
@@ -82,6 +103,7 @@ function(gris_bundle_configure_file)
 # BUNDLE target execution. This should be the executed in the main CMakeLists.txt-file after all targets 
 # have been added and all bundles are declared. 
 # It creates a cmake_bundle.$<CONFIG>.cmake-file in the CMake Binary folder of the project for every configuration.
+# gris_bundle_configure_file also creates the CLEAN_DEPLOY target.
 #
 # ARGUMENTS
 # gris_bundle_configure_file()
@@ -119,12 +141,14 @@ function(gris_bundle_add_lookup_directories_from_imported_target target)
   else()
     gris_bundle_add_lookup_directories(${_dir})
   endif()
+  
+  gris_bundle_add_lookup_directories("$<TARGET_FILE_DIR:${target}>")
 endfunction()
 
 function(gris_bundle_add_library lib)
 # gris_bundle_add_library adds libraries to the lookup directories of the bundle target. It uses the 
 # information present in the targets PROPERTIES (i.e. DEPLOY_DIRECTORY from DeployAfter and 
-# _gris_deploy_after_build) or the IMPORTED_LOCATION of IMPORTED targets.
+# _gris_deploy) or the IMPORTED_LOCATION of IMPORTED targets.
 # Internal targets (not IMPORTED) will use generator expressions. Non-targets will use the provided directory.
 #
 # ARGUMENTS
@@ -135,17 +159,38 @@ function(gris_bundle_add_library lib)
     if("${_ext}" STREQUAL "${CMAKE_SHARED_LIBRARY_SUFFIX}")
       # else it would be a static library and not added
       get_filename_component(_dir "${lib}" DIRECTORY)
-      gris_bundle_add_lookup_directories(${_dir})
-      
-      message(WARNING [=[
-      gris_bundle currently only works properly on TARGETs, but ${lib} is not defined as a TARGET.
-      ]=])
+      message(WARNING "gris_bundle currently only works properly on TARGETs, but ${lib} is not defined as a TARGET.")
+      IF(${_dir} STREQUAL "")
+        message(WARNING "${lib} is only a file without a path, this is currently not properly supported by gris_bundle_add_library().")
+      ELSE()
+        gris_bundle_add_lookup_directories(${_dir})
+      ENDIF()
     endif()
   else()
     get_property(_DEPLOY_DIRECTORY TARGET ${lib} PROPERTY DEPLOY_DIRECTORY)
+    # if target is deployed via gris_deploy, use the 'deployed' version
     if(_DEPLOY_DIRECTORY)
-      # use DEPLOY_DIRECTORY property
-      gris_bundle_add_lookup_directories("${_DEPLOY_DIRECTORY}")
+      get_property(_MAIN_DEPLOY_SUBDIRECTORY TARGET ${lib} PROPERTY MAIN_DEPLOY_SUBDIRECTORY)
+      IF(DEFINED target AND TARGET ${target})
+        get_property(tgt_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
+        get_property(tgt_MAIN_DEPLOY_SUBDIRECTORY TARGET ${target} PROPERTY MAIN_DEPLOY_SUBDIRECTORY)
+        IF(tgt_DEPLOY_DIRECTORY AND NOT "${tgt_DEPLOY_DIRECTORY}${tgt_MAIN_DEPLOY_SUBDIRECTORY}" STREQUAL "${_DEPLOY_DIRECTORY}${_MAIN_DEPLOY_SUBDIRECTORY}")
+          # add to the current target the command to copy libraries
+          get_property(tgt_INSTALL_DIRECTORY TARGET ${target} PROPERTY INSTALL_DIRECTORY)
+          _gris_prefix_folder(install_dir "${tgt_MAIN_DEPLOY_SUBDIRECTORY}" "${tgt_INSTALL_DIRECTORY}")
+          _gris_prefix_folder(deploy_dir "${tgt_MAIN_DEPLOY_SUBDIRECTORY}" "${tgt_DEPLOY_DIRECTORY}")
+          _gris_prefix_folder(deploy_dir "${deploy_dir}" "${CMAKE_BINARY_DIR}")
+  
+          _gris_copy_target_files(${target} ${lib} "${deploy_dir}" "${install_dir}")
+        # ELSE: deployed to the correct folder anyways
+        ENDIF()
+      ELSE()
+        # instead of bundling through the build location, deploy to path
+        _gris_prefix_folder(dir "${_MAIN_DEPLOY_SUBDIRECTORY}" "${_DEPLOY_DIRECTORY}")
+        _gris_prefix_folder(dir "${dir}" "${CMAKE_BINARY_DIR}")
+        # use DEPLOY_DIRECTORY property
+        gris_bundle_add_lookup_directories("${dir}")
+      ENDIF()
     else()
       get_property(_IMPORTED TARGET ${lib} PROPERTY IMPORTED)
       if(_IMPORTED AND ${_IMPORTED})
@@ -156,10 +201,6 @@ function(gris_bundle_add_library lib)
         endforeach()
       elseif()
         gris_bundle_add_lookup_directories("$<TARGET_FILE_DIR:${lib}>")
-      
-        message(WARNING [=[
-        gris_bundle currently uses deploy locations or imported locations
-        ]=])
       endif()
     endif()
   endif()
