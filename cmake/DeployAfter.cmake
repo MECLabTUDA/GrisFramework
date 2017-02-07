@@ -129,12 +129,17 @@ function(gris_deploy_files target sub)
 endfunction()
 
 function(gris_deploy_directories target sub)
-# gris_deploy_directories deploys additional directories into the specified destination folder (subfolder). The 
-# deployment of these directories is attached to the target passed. This function also installs these 
-# directories in the install target. Call this multiple times for different sub-folders. The folder will 
+# gris_deploy_directories deploys files (and folders) from additional directories into the specified destination 
+# folder (subfolder). The deployment of these directories is attached to the target passed. This function also 
+# installs these directories in the install target. Call this multiple times for different sub-folders. The folder will 
 # be created.
 # Calling without any directories simply creates the destination directory. The destination path should be relative, 
 # so the TARGETs DEPLOY_DIRECTORY will be prepended.
+#
+# EXAMPLE
+# gris_deploy_directories(${target} "examples/deploy_dirs" "C:/examplefiles" "data/examples/deploy_dirs")
+# This copies all files and folders in the folders "C:/examplefiles" "${CMAKE_SOURCE_DIR}/data/examples/deploy_dirs" into
+# "$<deployfolder>/examples/deploy_dirs".
 #
 # ARGUMENTS
 # gris_deploy_directories(target subfolder [directory1 [directory2 [...]]])
@@ -167,7 +172,7 @@ function(gris_deploy_directories target sub)
       ENDIF(NOT IS_ABSOLUTE ${dest})
       INSTALL(CODE "FILE(MAKE_DIRECTORY \"${install_folder}\")")
     ENDIF()
-  elseif()
+  else()
     # copy the files
     add_custom_command(TARGET ${target} POST_BUILD 
       COMMAND ${CMAKE_COMMAND} -E copy_directory
