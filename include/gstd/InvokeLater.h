@@ -17,13 +17,17 @@ class InvokeLater
 {
 public:
   typedef std::function<Args...> Functor;
-  InvokeLater(Functor t) : f(t) { }
-  InvokeLater(const InvokeLater& c) : f(c.f) {}
-  ~InvokeLater() { invoke(); }
+  InvokeLater(Functor t) : f(t), mDoInvoke(true) { }
+  InvokeLater(const InvokeLater& c) : f(c.f), mDoInvoke(c.mDoInvoke) {}
+  ~InvokeLater() { if(mDoInvoke) invoke(); }
+
+  void clear()  { mDoInvoke = false; }
+  void remove() { mDoInvoke = false; }
 private:
   InvokeLater& operator=(const InvokeLater& c) = delete;
   inline void invoke() { try{ f(); } catch (...) {} }
   Functor f;
+  bool mDoInvoke;
 };
 
 
