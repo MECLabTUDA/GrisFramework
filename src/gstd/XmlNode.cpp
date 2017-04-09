@@ -109,14 +109,9 @@ namespace gris
 
   /**
   */  
-  bool XmlNode::hasChild(const char* name)
+  bool XmlNode::hasChild(const char* name) const
   {
-    XmlNode node;
-    node.mp->node = mp->node.child(name);
-    if (node.mp->node.empty())
-      return false;
-    else
-      return true;
+    return !(mp->node.child(name).empty());
   }
 
   /**

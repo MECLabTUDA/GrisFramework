@@ -49,7 +49,7 @@ namespace gris
     public:
       std::vector<XmlNode> getChildren() const;
       XmlNode              getChild    (const char* name) const;
-      bool                 hasChild    (const char* name);
+      bool                 hasChild    (const char* name) const;
       void                 addChild    (const XmlNode& node);
       XmlNode              addChild    (const char* name);
       void                 addAttribute(const char* name, const char* value="");
