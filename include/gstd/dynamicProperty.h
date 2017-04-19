@@ -134,6 +134,9 @@ namespace gris {
         /** \brief List the names of the known parameters */
         void getPropertyNames(std::vector<std::string>& params) const;
 
+        /** \brief List the names of the known parameters */
+        std::vector<std::string>  propertyNames() const;
+
         /** \brief List the values of the known parameters, in the same order as getParamNames() */
         void getPropertyValues(std::vector<std::string> &vals) const;
 
