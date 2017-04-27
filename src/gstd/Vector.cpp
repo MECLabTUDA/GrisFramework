@@ -1,4 +1,3 @@
-#include "private/gris.pch"
 #include "Vector.h"
 
 namespace gris

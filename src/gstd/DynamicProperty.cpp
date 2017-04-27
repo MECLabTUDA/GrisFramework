@@ -1,4 +1,3 @@
-#include "private/gris.pch"
 #include "dynamicProperty.h"
 
 #include <boost/format.hpp>

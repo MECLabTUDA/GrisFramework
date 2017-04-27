@@ -1,5 +1,3 @@
-#include "private/gris.pch"
-
 #include "DynamicPropertyManager.h"
 #include "DynamicProperty.h"
 

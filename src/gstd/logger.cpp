@@ -1,4 +1,3 @@
-#include "private/gris.pch"
 #include "logger.h"
 #include "GrisFileLogger.h"
 

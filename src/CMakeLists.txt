@@ -2,6 +2,9 @@
 set(MODULE_NAME gstd)
 add_subdirectory(${MODULE_NAME})
 set_target_properties(${MODULE_NAME} PROPERTIES FOLDER Libraries)
+set(MODULE_NAME algorithm)
+add_subdirectory(${MODULE_NAME})
+set_target_properties(${MODULE_NAME} PROPERTIES FOLDER Libraries)
 
 if(BUILD_Testing)
   enable_testing()

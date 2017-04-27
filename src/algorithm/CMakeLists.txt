@@ -1,38 +1,24 @@
-project(gstd)
+project(algorithm)
 
 set(INC_DIR
 	${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/)
 
 set(Includes
-	${INC_DIR}Vector.h
-	${INC_DIR}XmlDocument.h
-	${INC_DIR}XmlNode.h
-	${INC_DIR}XmlAttribute.h
-	${INC_DIR}DynamicProperty.h
-	${INC_DIR}DynamicPropertyManager.h
-	${INC_DIR}InvokeLater.h
-	${INC_DIR}logger.h
-	${INC_DIR}GrisFileLogger.h
-	${INC_DIR}gstd_api.h
+	${INC_DIR}clamp.h
+  ${INC_DIR}dummy.h
+	${INC_DIR}algorithm_api.h
 	)
 set(Private_Includes
 	${INC_DIR}private/targetver.h
 	)	
 set(Sources	
-	DynamicProperty.cpp
-	DynamicPropertyManager.cpp
-	logger.cpp
-	GrisFileLogger.cpp
-	XmlDocument.cpp
-	XmlNode.cpp
-	XmlAttribute.cpp
-	Vector.cpp
+  dummy.cpp
 	)
 
 # configure the resource file
 gris_configure_resource_rc(Resources GrisFramework std ${PROJECT_NAME})
 
-gris_boost_find_and_fix("1.59" COMPONENTS filesystem)
+#gris_boost_find_and_fix("1.59" COMPONENTS filesystem)
 
 add_library(${PROJECT_NAME} SHARED
 	${Includes}
@@ -48,10 +34,8 @@ target_include_directories( ${PROJECT_NAME} PUBLIC
   
 #private includes
 target_link_libraries( ${PROJECT_NAME}	PRIVATE
-	pugixml
-  Boost::filesystem
-  LOKI
-	)
+#	Boost::filesystem
+  )
 	
 source_group("Header Files\\private" FILES
 	${Private_Includes}

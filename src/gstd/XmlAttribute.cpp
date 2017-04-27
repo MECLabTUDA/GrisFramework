@@ -1,4 +1,3 @@
-#include "private/gris.pch"
 #include "XmlAttribute.h"
 
 #include <pugixml.hpp>
