@@ -1,5 +1,5 @@
 # add_custom_target(BUNDLE ALL ${CMAKE_COMMAND} -D BUILD_TYPE=$<CONFIG> -P cmake_bundle.cmake)
-add_custom_target(BUNDLE ALL)
+add_custom_target(BUNDLE DEPENDS ALL_BUILD)
 
 set_target_properties(BUNDLE
   PROPERTIES 
