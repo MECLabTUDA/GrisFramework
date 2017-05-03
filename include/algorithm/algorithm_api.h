@@ -1,5 +1,5 @@
-#ifndef GRIS_GSTD_API_H
-#define GRIS_GSTD_API_H
+#ifndef GRIS_ALGORITHM_API_H
+#define GRIS_ALGORITHM_API_H
 
 #ifdef algorithm_EXPORTS
 #define GRIS_ALGORITHM_API __declspec (dllexport)

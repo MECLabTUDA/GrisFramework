@@ -2,7 +2,7 @@
 
 #include "algorithm_api.h"
 
-namespace muk {
+namespace gris {
 
   // same as std::clamp in C++17
   // implementation from http://en.cppreference.com/w/cpp/algorithm/clamp
