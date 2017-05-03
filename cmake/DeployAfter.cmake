@@ -235,7 +235,7 @@ function(_gris_copy_target_files current_target target "${deploy_dir}" "${instal
 # copy the files
   add_custom_command(TARGET ${current_target} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      "$<TARGET_FILE:${target}>" "$<TARGET_PDB_FILE:${target}>" "${deploy_dir}" 
+      "\"$<TARGET_FILE:${target}>\"" "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
     COMMENT "Copying Target ${target} to deploy directory ${install_dir}"
     )
 endfunction()
