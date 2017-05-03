@@ -1,15 +1,11 @@
-
-add_subdirectory(testLogger)
-add_subdirectory(testXml)
-add_subdirectory(testDynamicProperty)
-
+FUNCTION(_gris_add_test target)
+add_subdirectory(${target})
 #Use solution folders.
-
-set_target_properties(testLogger PROPERTIES FOLDER Tests)
-set_target_properties(testXml PROPERTIES FOLDER Tests)
-set_target_properties(testDynamicProperty PROPERTIES FOLDER Tests)
+set_target_properties(${target} PROPERTIES FOLDER Tests)
+ENDFUNCTION(_gris_add_test)
 
 
-
-
-
+_gris_add_test(testLogger)
+_gris_add_test(testXml)
+_gris_add_test(testDynamicProperty)
+_gris_add_test(testInvoker)
