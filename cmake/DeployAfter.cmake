@@ -1,7 +1,8 @@
 # set initial values
 # directory to deploy to
 SET(GRIS_DEPLOY_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIG>" CACHE PATH "path to the deploy directory, may contain generator expressions")
-MARK_AS_ADVANCED(GRIS_DEPLOY_DIRECTORY)
+SET(GRIS_LIB_INSTALL_DIRECTORY "lib" CACHE PATH "path to the library install directory")
+MARK_AS_ADVANCED(GRIS_DEPLOY_DIRECTORY GrisFramework_LIB_DIR)
 
 get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
@@ -43,6 +44,10 @@ function(gris_deploy target sub)
   IF(_DEPLOY_DIRECTORY)
     MESSAGE(FATAL_ERROR "Trying to redeploy ${target}. Redeploying a Target to a secondary location is not supported.")
   ENDIF()
+  GET_PROPERTY(lib_install_dir TARGET ${target} PROPERTY LIB_INSTALL_DIRECTORY)
+  IF(NOT lib_install_dir)
+    SET(lib_install_dir "${GRIS_LIB_INSTALL_DIRECTORY}")
+  ENDIF()
 
   IF(${ARGC} EQUAL 3 AND NOT "${ARGN}" STREQUAL "")
     SET(base "${ARGN}/")
@@ -57,9 +62,10 @@ function(gris_deploy target sub)
   ENDIF()
   _gris_ensure_slash_at_end("base" "${base}")
   _gris_ensure_slash_at_end("sub" "${sub}")
+  _gris_ensure_slash_at_end("lib_install_dir" "${lib_install_dir}")
   
   # build the proper path
-  IF(IS_ABSOLUTE "${sub}" OR IS_ABSOLUTE "${base}")
+  IF((IS_ABSOLUTE "${sub}" OR IS_ABSOLUTE "${base}") AND GRIS_INSTALL_DEPLOYED)
     message(WARNING [=[using gris_deploy() with an absolute path. This may not lead to the desired install path.]=])
   ENDIF()
   _gris_prefix_folder(deploy_base "${base}" "${GRIS_DEPLOY_DIRECTORY}")
@@ -79,7 +85,10 @@ function(gris_deploy target sub)
   set_property(TARGET ${target} PROPERTY INSTALL_DIRECTORY "${base}")
   set_property(TARGET ${target} PROPERTY MAIN_DEPLOY_SUBDIRECTORY "${sub}")
   IF(GRIS_INSTALL_DEPLOYED)
-    INSTALL(TARGETS ${target} EXPORT ${GRIS_INSTALL_EXPORT} DESTINATION "${install_dir}")
+    INSTALL(TARGETS ${target} EXPORT ${GRIS_INSTALL_EXPORT} RUNTIME DESTINATION "${install_dir}" LIBRARY DESTINATION "${lib_install_dir}")
+    IF(MSVC)
+      INSTALL(FILES "$<TARGET_PDB_FILE:${target}>" OPTIONAL DESTINATION "${install_dir}")
+    ENDIF()
   ENDIF()
 endfunction()
 
@@ -228,7 +237,7 @@ function(_gris_ensure_slash_at_end var in)
   ENDIF()
 endfunction()
 
-function(_gris_copy_target_files current_target target "${deploy_dir}" "${install_dir}")
+function(_gris_copy_target_files current_target target deploy_dir install_dir)
 # make the folder
   add_custom_command(TARGET ${current_target} PRE_LINK 
     COMMAND ${CMAKE_COMMAND} -E make_directory "${deploy_dir}")
@@ -238,4 +247,9 @@ function(_gris_copy_target_files current_target target "${deploy_dir}" "${instal
       "\"$<TARGET_FILE:${target}>\"" "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
     COMMENT "Copying Target ${target} to deploy directory ${install_dir}"
     )
+endfunction()
+
+function(gris_set_lib_install target directory)
+# set the library install folder of the target
+  set_property(TARGET ${target} PROPERTY LIB_INSTALL_DIRECTORY "${directory}")
 endfunction()
