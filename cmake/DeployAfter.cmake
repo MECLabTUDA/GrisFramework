@@ -85,7 +85,10 @@ function(gris_deploy target sub)
   set_property(TARGET ${target} PROPERTY INSTALL_DIRECTORY "${base}")
   set_property(TARGET ${target} PROPERTY MAIN_DEPLOY_SUBDIRECTORY "${sub}")
   IF(GRIS_INSTALL_DEPLOYED)
-    INSTALL(TARGETS ${target} EXPORT ${GRIS_INSTALL_EXPORT} RUNTIME DESTINATION "${install_dir}" LIBRARY DESTINATION "${lib_install_dir}")
+    INSTALL(TARGETS ${target} EXPORT ${GRIS_INSTALL_EXPORT} 
+      RUNTIME DESTINATION "${install_dir}" 
+      ARCHIVE DESTINATION "${lib_install_dir}"
+      LIBRARY DESTINATION "${lib_install_dir}")
     IF(MSVC)
       INSTALL(FILES "$<TARGET_PDB_FILE:${target}>" OPTIONAL DESTINATION "${install_dir}")
     ENDIF()
@@ -237,7 +240,7 @@ function(_gris_ensure_slash_at_end var in)
   ENDIF()
 endfunction()
 
-function(_gris_copy_target_files current_target target deploy_dir install_dir)
+function(_gris_copy_target_files current_target target deploy_dir dir_name)
 # make the folder
   add_custom_command(TARGET ${current_target} PRE_LINK 
     COMMAND ${CMAKE_COMMAND} -E make_directory "${deploy_dir}")
@@ -245,7 +248,7 @@ function(_gris_copy_target_files current_target target deploy_dir install_dir)
   add_custom_command(TARGET ${current_target} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
       "\"$<TARGET_FILE:${target}>\"" "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
-    COMMENT "Copying Target ${target} to deploy directory ${install_dir}"
+    COMMENT "Copying Target ${target} to deploy directory ${dir_name}"
     )
 endfunction()
 
