@@ -27,7 +27,7 @@ namespace gris
   void showProperties()
   {
     TestClass test;
-    test.print(std::cout);
+    test.printProperties(std::cout);
   }
 
   /**

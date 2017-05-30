@@ -45,8 +45,8 @@ namespace gris
       std::bind(&TestClass::setVecDouble, this, std::placeholders::_1),
       std::bind(&TestClass::getVecDouble, this));
 
-    include(*mpSubClass);
-    include(*mpSubClassPrefix, "prefix");
+    includeProperty(*mpSubClass);
+    includeProperty(*mpSubClassPrefix, "prefix");
   }
 
   /**
