@@ -123,13 +123,13 @@ namespace gris {
         }
 
         /** \brief Add a parameter to the set */
-        void add(const std::shared_ptr<IProperty> & prop);
+        void addProperty(const std::shared_ptr<IProperty> & prop);
 
         /** \brief Remove a parameter from the set */
-        void remove(const std::string &name);
+        void removeProperty(const std::string &name);
 
         /** \brief Include the params of a different ParamSet into this one. Optionally include a prefix for each of the parameters */
-        void include(const DynamicProperty& other, const std::string& prefix = "");
+        void includeProperty(const DynamicProperty& other, const std::string& prefix = "");
       
         /** \brief List the names of the known parameters */
         void getPropertyNames(std::vector<std::string>& params) const;
@@ -153,13 +153,13 @@ namespace gris {
         bool hasProperty(const std::string &key) const;
 
         /** \brief Get the number of parameters maintained by this instance */
-        std::size_t size() const        { return mProperties.size(); }
+        std::size_t numberOfProperties() const { return mProperties.size(); }
 
         /** \brief Clear all the set parameters */
-        void clear();
+        void clearProperties();
 
         /** \brief Print the parameters to a stream */
-        void print(std::ostream &out) const;
+        void printProperties(std::ostream &out) const;
                         
       private:
         using PropertyMap = std::map<std::string, std::shared_ptr<IProperty>>;
