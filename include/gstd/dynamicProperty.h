@@ -106,7 +106,7 @@ namespace gris {
     {
       public:
         DynamicProperty() {}
-        ~DynamicProperty() {}
+        virtual ~DynamicProperty() {}
 
         DynamicProperty(const DynamicProperty&) {}
         DynamicProperty& operator=(const DynamicProperty&) { return *this; }
