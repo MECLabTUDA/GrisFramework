@@ -72,9 +72,18 @@ namespace gris
 
       std::istream& operator>>(std::istream& is)
       {
-        for(size_t i(1); i<DIM; ++i)
-        is >> coeff[i-1]; is.get();
-        is >> coeff.back();
+        is >> coeff[0];
+        for (size_t i(1); i<DIM; ++i)
+        {
+          // this is for boost::lexical_cast which does not ignore white spaces
+          // see https://stackoverflow.com/questions/10382884/c-using-classes-with-boostlexical-cast
+          if ((is.flags() & std::ios_base::skipws) == 0) 
+          {
+            char whitespace;
+            is >> whitespace;
+          }
+          is >> coeff[i];
+        }
         return is;
       }
 

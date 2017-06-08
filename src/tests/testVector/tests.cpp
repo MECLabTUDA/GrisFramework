@@ -3,6 +3,9 @@
 #include <gstd/Vector.h>
 
 #include <boost/test/auto_unit_test.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/array.hpp>
 
 #include <iostream>
 
@@ -12,6 +15,18 @@ namespace
   using std::cout;
   using std::endl;
 }
+
+namespace boost {
+  namespace serialization {
+
+    template<class Archive, class T, class S, size_t N>
+    void serialize(Archive & ar, gris::Vector<T, S, N> & a, const unsigned int version)
+    {
+      ar & boost::serialization::make_array(a.data(), N);
+    }
+
+  } // namespace serialization
+} // namespace boost
 
 namespace gris
 { 
@@ -123,5 +138,17 @@ namespace gris
     BOOST_CHECK_EQUAL(x.cross(y), z);
 
     Vec3d arithmeticTest = x + 0.5*(y+z);
+  }
+
+  void testSerialization()
+  {
+    Vec3d input(1,2,3);
+    std::stringstream ss;
+    boost::archive::text_oarchive oa(ss);
+    oa & input;
+    Vec3d output;
+    boost::archive::text_iarchive ia(ss);
+    ia & output;
+    BOOST_CHECK_EQUAL(input, output);
   }
 }

@@ -129,7 +129,8 @@ namespace gris
         return *this;
       }
 
-      template<typename = std::enable_if_t<std::is_floating_point<T>::value>>, typename Scalar>
+      //template<typename Scalar, typename = std::enable_if_t<std::is_floating_point<T>::value>>
+      template<typename Scalar>
       friend Vector<T, S, DIM> operator/(Vector<T, S, DIM> q, Scalar val)
       {
         for(size_t i(0); i<DIM; ++i)

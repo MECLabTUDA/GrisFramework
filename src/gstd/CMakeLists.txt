@@ -5,8 +5,7 @@ set(INC_DIR
 
 set(Includes
 	${INC_DIR}BaseVector.h
-	${INC_DIR}DiscreteVector.h
-	${INC_DIR}FieldVector.h
+	${INC_DIR}VectorImpl.h
 	${INC_DIR}Vector.h
 	${INC_DIR}XmlDocument.h
 	${INC_DIR}XmlNode.h

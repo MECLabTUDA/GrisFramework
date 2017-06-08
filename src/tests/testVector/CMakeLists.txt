@@ -15,7 +15,7 @@ set(Sources
 set(Files
 	)
 
-gris_boost_find_and_fix("1.59" COMPONENTS filesystem unit_test_framework)
+gris_boost_find_and_fix("1.59" COMPONENTS filesystem unit_test_framework serialization)
 
 add_executable(${PROJECT_NAME}
 	${Private_Includes}
@@ -32,6 +32,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME}
 	gstd
 	Boost::unit_test_framework
+	Boost::serialization
 	)
 
 source_group("Header Files\\private" FILES

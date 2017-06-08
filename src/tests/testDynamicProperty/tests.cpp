@@ -89,10 +89,14 @@ namespace gris
   void testVec3d()
   {
     TestClass test;
-    test.setVec3d(Vec3d(41,42,43));
+    const auto input = Vec3d(41,42,43);
+    test.setVec3d(input);
     std::string value;
     test.getProperty("Vec3d", value);
     BOOST_CHECK(value == "41 42 43");
+    test.setProperty("Vec3d", value);
+    auto output = test.getVec3d();
+    BOOST_CHECK_EQUAL(input, output);
   }
 
   void testVecDouble()
