@@ -4,6 +4,9 @@ set(INC_DIR
 	${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/)
 
 set(Includes
+	${INC_DIR}BaseVector.h
+	${INC_DIR}DiscreteVector.h
+	${INC_DIR}FieldVector.h
 	${INC_DIR}Vector.h
 	${INC_DIR}XmlDocument.h
 	${INC_DIR}XmlNode.h
@@ -43,14 +46,15 @@ add_library(${PROJECT_NAME} SHARED
 # public includes
 target_include_directories( ${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/>
-  $<INSTALL_INTERFACE:${GrisFramework_INCLUDE_INSTALL_DIR}>
+	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
+	$<INSTALL_INTERFACE:${GrisFramework_INCLUDE_INSTALL_DIR}>
   )
   
 #private includes
 target_link_libraries( ${PROJECT_NAME}	PRIVATE
 	pugixml
-  Boost::filesystem
-  LOKI
+	Boost::filesystem
+	LOKI
 	)
 	
 source_group("Header Files\\private" FILES
