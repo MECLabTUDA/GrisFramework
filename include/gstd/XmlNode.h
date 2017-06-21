@@ -68,37 +68,47 @@ namespace gris
   class GRIS_GSTD_API XmlException : public std::exception
   {
     public:
-    enum EnType
-    {
-      InvalidXmlDocument,
-      FileNotFound,
-      ChildNotFound,
-      AttributeNotFound,
-      SavingFailed,
-      N_Items
-    };
+      enum EnType
+      {
+        InvalidXmlDocument,
+        FileNotFound,
+        ChildNotFound,
+        AttributeNotFound,
+        SavingFailed,
+        N_Items
+      };
 
-    const char* Strings[N_Items] = 
-    {
-      "Not a valid XML document",
-      "File not found!",
-      "Child not found!",
-      "Attribute not found!",
-      "Saving failed!"
-    };
+      const char* Strings[N_Items] = 
+      {
+        "Not a valid XML document",
+        "File not found",
+        "Child not found",
+        "Attribute not found",
+        "Saving failed"
+      };
 
     public:
-    explicit XmlException(EnType type)
-    {
-      mType = type;
-      mStr = Strings[mType];
-    }
+      explicit XmlException(EnType type)
+      {
+        mType = type;
+        mStr = Strings[mType];
+      }
 
-    virtual char const* what() const { return mStr.c_str(); }
+      explicit XmlException(EnType type, const std::string& info)
+      {
+        mType = type;
+        mStr = Strings[mType];
+        mInfo = info;
+      }
+
+      void addInfo(const std::string& str) { mInfo = str; }
+
+      virtual char const* what() const;
 
     private:
-    EnType mType;
-    std::string mStr;
+      EnType mType;
+      std::string mStr;
+      std::string mInfo;
   };
 
 }

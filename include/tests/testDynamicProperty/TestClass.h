@@ -31,8 +31,8 @@ namespace gris
       bool   getBool() const      { return mBool; }
       void   setBool(bool b)      { mBool = b; }
 
-      const gstd::Vec3d&  getVec3d() const { return mVec; }
-      void                setVec3d(const gstd::Vec3d& vec) { mVec = vec; }
+      const Vec3d&  getVec3d() const { return mVec; }
+      void                setVec3d(const Vec3d& vec) { mVec = vec; }
 
       const std::vector<double>&  getVecDouble()                                const { return mVecDouble; }
       void                        setVecDouble(const std::vector<double>& vec)        { mVecDouble = vec; }
@@ -42,7 +42,7 @@ namespace gris
       bool   mBool;
       int    mInt;
       size_t mSize_t;
-      gstd::Vec3d  mVec;
+      Vec3d  mVec;
       std::vector<double> mVecDouble;
       std::unique_ptr<TestSubClass> mpSubClass;
       std::unique_ptr<TestSubClass> mpSubClassPrefix;
