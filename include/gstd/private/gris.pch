@@ -1,6 +1,0 @@
-#pragma once
-
-
-#define GRIS_GSTD_CREATE_DLL
-
-#pragma warning( disable : 4251 ) // dll-interface warnings

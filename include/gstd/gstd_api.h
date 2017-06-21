@@ -1,8 +1,9 @@
 #ifndef GRIS_GSTD_API_H
 #define GRIS_GSTD_API_H
 
-#ifdef GRIS_GSTD_CREATE_DLL
+#ifdef gstd_EXPORTS
 #define GRIS_GSTD_API __declspec (dllexport)
+#pragma warning( disable : 4251 ) // dll-interface warnings
 #else
 #define GRIS_GSTD_API __declspec (dllimport)
 #endif

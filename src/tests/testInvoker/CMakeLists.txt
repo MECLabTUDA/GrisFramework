@@ -1,20 +1,16 @@
-project(testDynamicProperty)
+project(testInvoker)
 
 set(INC_DIR ${CMAKE_SOURCE_DIR}/include/${MODULE_NAME}/${PROJECT_NAME}/)
 	
 set(Private_Includes
-	${INC_DIR}private/test.pch
 	)
 set(Includes
-	${INC_DIR}custom_streams.h
-	${INC_DIR}TestClass.h
-	${INC_DIR}testDynamicPropertyManager.h
+	${INC_DIR}testInvoker.h
 	${INC_DIR}tests.h
 	)
 set(Sources	
 	main.cpp
-	TestClass.cpp
-	testDynamicPropertyManager.cpp	
+	testInvoker.cpp	
 	tests.cpp
 	)
 	
@@ -37,7 +33,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	
 target_link_libraries(${PROJECT_NAME}
 	gstd
-	Boost::filesystem
 	Boost::unit_test_framework
 	)
 

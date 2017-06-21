@@ -1,4 +1,3 @@
-#include "private/gris.pch"
 #include "dynamicProperty.h"
 
 #include <boost/format.hpp>
@@ -67,6 +66,14 @@ namespace gris
         props.push_back(it->first);
     }
 
+    std::vector<std::string>  DynamicProperty::propertyNames() const
+    {
+      std::vector<std::string>  props(mProperties.size());
+      for (PropertyMap::const_iterator it = mProperties.begin(); it != mProperties.end(); ++it)
+        props.push_back(it->first);
+      return props;
+    }
+
     void DynamicProperty::getPropertyValues(std::vector<std::string> &vals) const
     {
       std::vector<std::string> names;
@@ -86,7 +93,7 @@ namespace gris
       return mProperties.find(key) != mProperties.end();
     }
 
-    void DynamicProperty::include(const DynamicProperty &other, const std::string &prefix)
+    void DynamicProperty::includeProperty(const DynamicProperty &other, const std::string &prefix)
     {
       const PropertyMap &p = other.getPropertyMap();
       if (prefix.empty())
@@ -97,17 +104,17 @@ namespace gris
           mProperties[prefix + "." + it->first] = it->second;
     }
 
-    void DynamicProperty::remove(const std::string &name)
+    void DynamicProperty::removeProperty(const std::string &name)
     {
       mProperties.erase(name);
     }
 
-    void DynamicProperty::clear()
+    void DynamicProperty::clearProperties()
     {
       mProperties.clear();
     }
 
-    void DynamicProperty::print(std::ostream &out) const
+    void DynamicProperty::printProperties(std::ostream &out) const
     {
       for (PropertyMap::const_iterator it = mProperties.begin() ; it != mProperties.end() ; ++it)
         out << it->first << " = " << it->second->getValue() << std::endl;

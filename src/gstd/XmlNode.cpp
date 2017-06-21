@@ -1,4 +1,3 @@
-#include "private/gris.pch"
 #include "XmlNode.h"
 
 #include <pugixml.hpp>
@@ -101,22 +100,16 @@ namespace gris
     node.mp->node = mp->node.child(name);
     if (node.mp->node.empty())
     {
-      std::cout << "could not find child with name " << name << endl;
-      throw XmlException(XmlException::ChildNotFound);
+      throw XmlException(XmlException::ChildNotFound, name);
     }
     return node;
   }
 
   /**
   */  
-  bool XmlNode::hasChild(const char* name)
+  bool XmlNode::hasChild(const char* name) const
   {
-    XmlNode node;
-    node.mp->node = mp->node.child(name);
-    if (node.mp->node.empty())
-      return false;
-    else
-      return true;
+    return !(mp->node.child(name).empty());
   }
 
   /**
@@ -125,7 +118,9 @@ namespace gris
   {
     XmlAttribute res(&mp->node.attribute(name));
     if (res.mAtt->empty())
-      throw XmlException(XmlException::AttributeNotFound);
+    {
+      throw XmlException(XmlException::AttributeNotFound, name);
+    }
     return res;
   }
 
@@ -209,6 +204,13 @@ namespace gris
   std::ostream& operator<<(std::ostream& os, const XmlNode& node)
   {
     return node.print(os);
+  }
+
+  /**
+  */
+  char const* XmlException::what() const 
+  {
+    return std::string(mStr).append(": ").append(mInfo).c_str();
   }
 
 }

@@ -8,16 +8,6 @@
 #include <sstream>
 
 using namespace std;
-using namespace gris;
-
-namespace
-{
-  bool equals(const std::string& lhs, const std::string& rhs)
-  {
-    return 0 == lhs.compare(rhs);
-  }
-}
-
 using namespace gris::gstd;
 
 namespace gris
@@ -27,7 +17,7 @@ namespace gris
   void showProperties()
   {
     TestClass test;
-    test.print(std::cout);
+    test.printProperties(std::cout);
   }
 
   /**
@@ -39,7 +29,7 @@ namespace gris
     std::string value;
     test.getProperty("double", value);
     value.resize(5); // make sure rounding is ignored
-    BOOST_CHECK(equals("42.42", value));    
+    BOOST_CHECK(value == "42.42");    
   }
 
   void testInt()
@@ -49,7 +39,7 @@ namespace gris
     test.setProperty("int", ref);
     std::string value;
     test.getProperty("int", value);
-    BOOST_CHECK(equals("42", value));
+    BOOST_CHECK(value == "42");
   }
 
   void testSize_t()
@@ -59,7 +49,7 @@ namespace gris
     test.setProperty("size_t", ref);
     std::string value;
     test.getProperty("size_t", value);
-    BOOST_CHECK(equals("42", value));
+    BOOST_CHECK(value == "42");
   }
 
   void testBool()
@@ -71,23 +61,23 @@ namespace gris
       // check possibilities for false
       test.setProperty("bool", "0");
       test.getProperty("bool", value);
-      BOOST_CHECK(equals("0", value));
+      BOOST_CHECK(value == "0");
       test.setProperty("bool", "false");
       test.getProperty("bool", value);
-      BOOST_CHECK(equals("0", value));
+      BOOST_CHECK(value == "0");
       test.setProperty("bool", "False");
       test.getProperty("bool", value);
-      BOOST_CHECK(equals("0", value));
+      BOOST_CHECK(value == "0");
       // check possibilities for true
       test.setProperty("bool", "1");
       test.getProperty("bool", value);
-      BOOST_CHECK(equals("1", value));
+      BOOST_CHECK(value == "1");
       test.setProperty("bool", "true");
       test.getProperty("bool", value);
-      BOOST_CHECK(equals("1", value));
+      BOOST_CHECK(value == "1");
       test.setProperty("bool", "True");
       test.getProperty("bool", value);
-      BOOST_CHECK(equals("1", value));
+      BOOST_CHECK(value == "1");
     }
     catch (std::exception& e)
     {
@@ -99,10 +89,14 @@ namespace gris
   void testVec3d()
   {
     TestClass test;
-    test.setVec3d(Vec3d(41,42,43));
+    const auto input = Vec3d(41,42,43);
+    test.setVec3d(input);
     std::string value;
     test.getProperty("Vec3d", value);
-    BOOST_CHECK(equals("41 42 43", value));
+    BOOST_CHECK(value == "41 42 43");
+    test.setProperty("Vec3d", value);
+    auto output = test.getVec3d();
+    BOOST_CHECK_EQUAL(input, output);
   }
 
   void testVecDouble()
@@ -114,7 +108,7 @@ namespace gris
       test.setProperty("VecDouble", ref);
       std::string value;
       test.getProperty("VecDouble", value);
-      BOOST_CHECK(equals(ref, value));
+      BOOST_CHECK(value == ref);
     }
     catch (std::exception& e)
     {
@@ -136,7 +130,7 @@ namespace gris
       std::string value;
       test.getProperty(key, value);
       value.resize(5); // ignore rounding errors
-      BOOST_CHECK(equals(ref, value));
+      BOOST_CHECK(value == ref);
     }
     catch (std::exception& e)
     {
@@ -158,7 +152,7 @@ namespace gris
       std::string value;
       test.getProperty(key, value);
       value.resize(5); // ignore rounding errors
-      BOOST_CHECK(equals(ref, value));
+      BOOST_CHECK(value == ref);
     }
     catch (std::exception& e)
     {
@@ -204,7 +198,7 @@ namespace gris
     }
     catch (std::exception& e)
     {
-      BOOST_CHECK( 0==strcmp(e.what(), "getProperty: Property with key 'nonexistent' was not found") );
+      BOOST_CHECK( std::string("getProperty: Property with key 'nonexistent' was not found") == e.what() );
       throw e;
     }
   }

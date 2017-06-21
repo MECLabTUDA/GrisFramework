@@ -1,5 +1,7 @@
+SET(GRIS_INSTALL_BUNDLED "ON" CACHE BOOL "whether files bundled should also be installed.")
+
 # add_custom_target(BUNDLE ALL ${CMAKE_COMMAND} -D BUILD_TYPE=$<CONFIG> -P cmake_bundle.cmake)
-add_custom_target(BUNDLE ALL)
+add_custom_target(BUNDLE DEPENDS ALL_BUILD)
 
 set_target_properties(BUNDLE
   PROPERTIES 
@@ -69,12 +71,12 @@ function(gris_bundle target)
   foreach(_lib IN LISTS _dep_targets)
     gris_bundle_add_library(${_lib})
   endforeach()
-  IF(GRIS_INSTALL_DEPLOYED)
+  IF(GRIS_INSTALL_DEPLOYED AND GRIS_INSTALL_BUNDLED)
     # install all libraries for tests
     install(DIRECTORY "${deploy_dir}/"
       DESTINATION             "${install_dir}"
       FILES_MATCHING PATTERN  "*${CMAKE_SHARED_LIBRARY_SUFFIX}")
-  ENDIF(GRIS_INSTALL_DEPLOYED)
+  ENDIF(GRIS_INSTALL_DEPLOYED AND GRIS_INSTALL_BUNDLED)
 endfunction()
 
 function(gris_bundle_add_lookup_directories)

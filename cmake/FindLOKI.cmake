@@ -15,7 +15,7 @@ if(NOT LOKI_DIR)
   else()
     set(_SDK_BASEPATH "${CMAKE_INSTALL_PREFIX}")
   endif()
-  set(LOKI_DIR "${_SDK_BASEPATH}/loki-0.1.7" CACHE STRING "Specifies the loki include directory")
+  set(LOKI_DIR "${_SDK_BASEPATH}/loki-0.1.7" CACHE PATH "Specifies the loki include directory")
 endif()
 
 if(NOT TARGET LOKI AND LOKI_DIR)
