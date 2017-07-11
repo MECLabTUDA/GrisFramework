@@ -84,8 +84,11 @@ function(gris_bundle_add_lookup_directories)
 #
 # ARGUMENTS
 # gris_bundle_add_lookup_directories(path1 [path2 [...]])
+  GET_PROPERTY(_BUNDLE_LOOKUPDIRS TARGET BUNDLE PROPERTY LOOKUP_DIRECTORIES)
   foreach(_dir IN LISTS ARGN)
-    set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES "${_dir}")
+    if(NOT "${_dir}" IN_LIST _BUNDLE_LOOKUPDIRS)
+      set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES "${_dir}")
+    endif()
   endforeach()
 endfunction()
 
@@ -95,8 +98,11 @@ function(gris_bundle_add_lookup_directories_config _conf)
 # ARGUMENTS
 # gris_bundle_add_lookup_directories_config(config path1 [path2 [...]])
   string(TOUPPER ${_conf} _conf)
+  GET_PROPERTY(_BUNDLE_LOOKUPDIRS TARGET BUNDLE PROPERTY LOOKUP_DIRECTORIES_${_conf})
   foreach(_dir IN LISTS ARGN)
-    set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES_${_conf} "${_dir}")
+    if(NOT "${_dir}" IN_LIST _BUNDLE_LOOKUPDIRS)
+      set_property(TARGET BUNDLE APPEND PROPERTY LOOKUP_DIRECTORIES_${_conf} "${_dir}")
+    endif()
   endforeach()
 endfunction()
 
