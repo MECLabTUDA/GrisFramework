@@ -191,6 +191,43 @@ namespace gris
     return XmlAttribute (&att);    
   }
 
+  std::vector<XmlNode> XmlNode::XPathNodes(const char * query) const
+  {
+    std::vector<XmlNode> result;
+    pugi::xpath_node_set nodes;
+    try {
+       nodes = mp->node.select_nodes(query);
+    }
+    catch (const pugi::xpath_exception& e)
+    {
+      throw XmlException(XmlException::XPathInvalid, e.what());
+    }
+    for (auto it = nodes.begin(); it != nodes.end(); ++it)
+    {
+      XmlNode node;
+      node.mp->node = it->node();
+      result.push_back(node);
+    }
+    return std::vector<XmlNode>();
+  }
+
+  XmlNode XmlNode::XPathNode(const char * query) const
+  {
+    XmlNode node;
+    try {
+      node.mp->node = mp->node.select_node(query).node();
+    } 
+    catch (const pugi::xpath_exception& e)
+    {
+      throw XmlException(XmlException::XPathInvalid, e.what());
+    }
+    if (node.mp->node.empty())
+    {
+      throw XmlException(XmlException::XPathNotFound, query);
+    }
+    return node;
+  }
+
   /**
   */
   ostream& XmlNode::print(ostream& os) const

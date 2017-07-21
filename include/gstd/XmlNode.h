@@ -53,7 +53,11 @@ namespace gris
       void                 addChild    (const XmlNode& node);
       XmlNode              addChild    (const char* name);
       void                 addAttribute(const char* name, const char* value="");
-      XmlAttribute         addAttribute(const char* name);      
+      XmlAttribute         addAttribute(const char* name);
+
+    public:
+      std::vector<XmlNode> XPathNodes  (const char* name) const;
+      XmlNode              XPathNode   (const char* name) const;
 
     public:
       std::ostream& print(std::ostream& os) const;
@@ -75,6 +79,8 @@ namespace gris
         ChildNotFound,
         AttributeNotFound,
         SavingFailed,
+        XPathNotFound,
+        XPathInvalid,
         N_Items
       };
 
@@ -84,6 +90,8 @@ namespace gris
         "File not found",
         "Child not found",
         "Attribute not found",
+        "XPath not found",
+        "XPath invalid",
         "Saving failed"
       };
 
