@@ -5,6 +5,7 @@ set(INC_DIR
 
 set(Includes
 	${INC_DIR}BaseVector.h
+  ${INC_DIR}Exception.h
 	${INC_DIR}VectorImpl.h
 	${INC_DIR}Vector.h
 	${INC_DIR}XmlDocument.h
@@ -12,6 +13,8 @@ set(Includes
 	${INC_DIR}XmlAttribute.h
 	${INC_DIR}DynamicProperty.h
 	${INC_DIR}DynamicPropertyManager.h
+  ${INC_DIR}IObservable.h
+  ${INC_DIR}IObservableWithReturn.h
 	${INC_DIR}InvokeLater.h
 	${INC_DIR}logger.h
 	${INC_DIR}GrisFileLogger.h
@@ -22,6 +25,7 @@ set(Private_Includes
 	)	
 set(Sources	
 	DynamicProperty.cpp
+  Exception.cpp
 	DynamicPropertyManager.cpp
 	logger.cpp
 	GrisFileLogger.cpp
