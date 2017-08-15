@@ -75,10 +75,13 @@ function(gris_deploy target sub)
   _gris_prefix_folder(install_dir "${sub}" "${base}")
   _gris_prefix_folder(deploy_dir "${sub}" "${dest}")
   
-  _gris_copy_target_files(${target} ${target} "${deploy_dir}" "${install_dir}")
-  
+  get_property(tgt_type TARGET ${target} PROPERTY TYPE)
+  IF(tgt_type STREQUAL SHARED_LIBRARY)
+    _gris_copy_target_files(${target} ${target} "${deploy_dir}" "${install_dir}")
+    
 # clean the directory from deploy folder
-  _gris_add_clean_directory("${deploy_dir}" "${install_dir}")
+    _gris_add_clean_directory("${deploy_dir}" "${install_dir}")
+  ENDIF()
   
 # TYPE STATIC_LIBRARY, MODULE_LIBRARY, SHARED_LIBRARY, INTERFACE_LIBRARY, EXECUTABLE
   set_property(TARGET ${target} PROPERTY DEPLOY_DIRECTORY "${deploy_base}")
@@ -89,7 +92,7 @@ function(gris_deploy target sub)
       RUNTIME DESTINATION "${install_dir}" 
       ARCHIVE DESTINATION "${lib_install_dir}"
       LIBRARY DESTINATION "${lib_install_dir}")
-    IF(MSVC)
+    IF(MSVC AND tgt_type STREQUAL SHARED_LIBRARY)
       INSTALL(FILES "$<TARGET_PDB_FILE:${target}>" OPTIONAL DESTINATION "${install_dir}")
     ENDIF()
   ENDIF()
