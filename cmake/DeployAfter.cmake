@@ -76,7 +76,7 @@ function(gris_deploy target sub)
   _gris_prefix_folder(deploy_dir "${sub}" "${dest}")
   
   get_property(tgt_type TARGET ${target} PROPERTY TYPE)
-  IF(tgt_type STREQUAL SHARED_LIBRARY)
+  IF(tgt_type STREQUAL SHARED_LIBRARY OR tgt_type STREQUAL EXECUTABLE)
     _gris_copy_target_files(${target} ${target} "${deploy_dir}" "${install_dir}")
     
 # clean the directory from deploy folder
