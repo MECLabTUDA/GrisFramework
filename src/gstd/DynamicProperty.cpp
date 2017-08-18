@@ -5,13 +5,50 @@
 #include <stdlib.h>
 #include <algorithm>
 
+#include "Exception.h"
+
 namespace gris
 {
   namespace gstd
   {
+
+    const PropertyDefinition IProperty::DEFAULTS[5] = 
+    {
+      { PropertyDefinition::Unknown, ""},
+      { PropertyDefinition::String, "" },
+      { PropertyDefinition::Boolean, "" },
+      { PropertyDefinition::Float, "" },
+      { PropertyDefinition::Integer, "" }
+    };
+
+    template <> 
+    const PropertyDefinition* Property<double>::DEFAULT_DEFINITION()
+    {
+      return &DEFAULTS[3];
+    }
+
+    template <>
+    const PropertyDefinition* Property<int>::DEFAULT_DEFINITION()
+    {
+      return &DEFAULTS[4];
+    }
+
+    template <>
+    const PropertyDefinition* Property<std::string>::DEFAULT_DEFINITION()
+    {
+      return &DEFAULTS[1];
+    }
+
+    template <>
+    const PropertyDefinition* Property<bool>::DEFAULT_DEFINITION()
+    {
+      return &DEFAULTS[0];
+    }
+
     /**
     */
-    IProperty::IProperty()
+    IProperty::IProperty(const PropertyDefinition& propdef)
+      : mPropertyDefinition(propdef)
     {
     }
 
@@ -120,5 +157,20 @@ namespace gris
         out << it->first << " = " << it->second->getValue() << std::endl;
     }
 
-  }
+    IProperty & DynamicProperty::operator[](const std::string & name)
+    {
+      auto it = mProperties.find(name);
+      if (it == mProperties.end())
+        throw GSTD_EXCEPTION_FORMAT("The property '%s' does not exist.", name);
+
+      return *(it->second);
+    }
+
+    PropertyDefinition::PropertyDefinition(const EnHints hint, const char * descriptor)
+      : mHint(hint)
+      , mDescriptor(descriptor)
+    {
+    }
+
+}
 }

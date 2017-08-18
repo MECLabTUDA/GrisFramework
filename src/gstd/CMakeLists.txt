@@ -1,12 +1,13 @@
 project(gstd)
 
 set(INC_DIR
-	${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/)
+  ${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/)
 
 set(Includes
-	${INC_DIR}BaseVector.h
+  ${INC_DIR}ContainerStreamOperators.h
+  ${INC_DIR}BaseVector.h
   ${INC_DIR}Exception.h
-	${INC_DIR}VectorImpl.h
+  ${INC_DIR}VectorImpl.h
 	${INC_DIR}Vector.h
 	${INC_DIR}XmlDocument.h
 	${INC_DIR}XmlNode.h
@@ -55,17 +56,21 @@ target_include_directories( ${PROJECT_NAME} PUBLIC
   
 #private includes
 target_link_libraries( ${PROJECT_NAME}	PRIVATE
-	pugixml
-	Boost::filesystem
-	LOKI
-	)
-	
+  pugixml
+  LOKI
+  ${Private_LIBRARIES}
+  )
+
+target_link_libraries( ${PROJECT_NAME} PUBLIC 
+  Boost::filesystem
+  )
+
 source_group("Header Files\\private" FILES
-	${Private_Includes}
-	)
+  ${Private_Includes}
+  )
 source_group("Resources" FILES
-	${Resources}
-	)
+  ${Resources}
+  )
 
 # add version information to output file name
 gris_append_product_version(${PROJECT_NAME} GrisFramework)
@@ -76,5 +81,5 @@ gris_deploy(${PROJECT_NAME} "${GrisFramework_BIN_DIR}" "")
 
 # ---------- install includes
 install(FILES ${Includes} DESTINATION "${GrisFramework_INCLUDE_INSTALL_DIR}/${PROJECT_NAME}" )
-		 
-	
+     
+  

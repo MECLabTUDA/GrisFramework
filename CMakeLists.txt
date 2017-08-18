@@ -53,6 +53,7 @@ set(Boost_USE_DEBUG_RUNTIME OFF)
 
 gris_boost_find_and_fix("1.59")
 
+set(LOKI_DIR "${SDK_BASEPATH}/loki-0.1.7"  CACHE PATH "LOKI directory")
 find_package(LOKI)
 
 gris_pugixml_find_and_fix()

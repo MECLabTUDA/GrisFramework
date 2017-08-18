@@ -16,18 +16,47 @@
 namespace gris {
 	namespace gstd  // gris std
 	{
+    class GRIS_GSTD_API PropertyDefinition
+    {
+    public:
+      enum EnHints
+      {
+        Unknown,
+        String,
+        Boolean,
+        Float,
+        Integer,
+        Color, 
+        Vector3,
+        Matrix4x4,
+        Path
+      };
+    public:
+      PropertyDefinition(const EnHints hint = EnHints::String, const char* descriptor = "");
+      virtual ~PropertyDefinition() {}
+
+    public:
+      const PropertyDefinition::EnHints hint()       const { return mHint; }
+      const char*                       descriptor() const { return mDescriptor; }
+
+      std::string hintDescriptor() const { return descriptor(); }
+
+    protected:
+      const EnHints  mHint;
+      const char*    mDescriptor;
+    };
 
     class GRIS_GSTD_API IProperty
     {
       public:
-        IProperty();
+        IProperty(const PropertyDefinition& propdef);
         virtual ~IProperty();
 
 	    public:
 		    /** \brief Set the value of the parameter. The value is taken in as a string, but converted to the type of that parameter. */
-		    virtual bool setValue(const std::string& value) = 0;
+		    virtual bool setValue(const ::std::string& value) = 0;
 		    /** \brief Retrieve the value of the parameter, as a string. */
-		    virtual std::string getValue() const = 0;
+		    virtual ::std::string getValue() const = 0;
 
       protected:
         /** \brief Bool values such as "false" cannot be converted to bool using lexical_cast. We need to
@@ -40,66 +69,83 @@ namespace gris {
 
       private:
         /** \brief Map "false", "False", "FALSE",  "F", "f", "0" to "0" and everything else to "1". */
-        static const std::string& truthValueTo01Str(const std::string &value);
+        static const ::std::string& truthValueTo01Str(const ::std::string &value);
+
+    public:
+        const PropertyDefinition::EnHints hint()       const { return mPropertyDefinition.hint(); }
+        const char*                       descriptor() const { return mPropertyDefinition.descriptor(); }
+
+        std::string hintDescriptor() const { return descriptor(); }
+
+
+    protected:
+      PropertyDefinition mPropertyDefinition;
+
+      static const PropertyDefinition DEFAULTS[5];
     };
 
 
     template<typename T>
     class Property : public IProperty
     {
-      public:
-        /** \brief The type for the 'setter' function for this parameter */
-        typedef std::function<void(T)> SetterFn;
-        /** \brief The type for the 'getter' function for this parameter */
-        typedef std::function<T(void)> GetterFn;
+    public:
+      static const PropertyDefinition* DEFAULT_DEFINITION() { return &DEFAULTS[0]; }
 
-      public:
-        Property(const SetterFn& setter, const GetterFn& getter) 
-          : IProperty(), mSetter(setter), mGetter(getter)
+    public:
+      /** \brief The type for the 'setter' function for this parameter */
+      typedef std::function<void(T)> SetterFn;
+      /** \brief The type for the 'getter' function for this parameter */
+      typedef std::function<T(void)> GetterFn;
+
+    public:
+      Property(const SetterFn& setter, const GetterFn& getter, const PropertyDefinition* propdef = Property<T>::DEFAULT_DEFINITION())
+        // dont allow nullptr for PropertyDefinition
+        : IProperty(propdef == nullptr ? *DEFAULT_DEFINITION() : *propdef)
+        , mSetter(setter), mGetter(getter)
+      {
+        if (!mSetter && !mGetter)
+          throw std::exception("One setter or getter function must be specified for parameter");
+      }
+
+      virtual ~Property()
+      {
+      }
+
+      virtual bool setValue(const std::string& value)
+      {
+        bool result = true;
+        try
         {
-          if (!mSetter && !mGetter)
-            throw std::exception("At least one setter or getter function must be specified for parameter");
+          if (mSetter)
+            mSetter(boost::lexical_cast<T>(IProperty::maybeWrapBool<T>(value)));
         }
-
-        virtual ~Property()
+        catch (boost::bad_lexical_cast &e)
         {
+          result = false;
+          throw std::exception((boost::format("Unable to set property from string: '%s' (error: %s)") % value % e.what()).str().c_str());
         }
+        return result;
+      }
 
-        virtual bool setValue(const std::string& value)
-        {
-          bool result = true;
+      virtual std::string getValue() const
+      {
+        if (mGetter)
           try
-          {
-            if (mSetter)
-              mSetter(boost::lexical_cast<T>(IProperty::maybeWrapBool<T>(value)));
-          }
-          catch (boost::bad_lexical_cast &e)
-          {
-            result = false;
-            throw std::exception( (boost::format("Unable to set property from string: '%s' (error: %s)") % value % e.what() ).str().c_str() );
-          }
-          return result;
-        }
-
-        virtual std::string getValue() const
         {
-          if (mGetter)
-            try
-          {
-            return boost::lexical_cast<std::string>(mGetter());
-          }
-          catch (boost::bad_lexical_cast& e)
-          {
-            throw std::exception((boost::format("Unable to cast property to a string (error: %s)") % e.what()).str().c_str());
-            return "";
-          }
-          else
-            return "";
+          return boost::lexical_cast<std::string>(mGetter());
         }
-        
-      protected:
-        SetterFn mSetter;
-        GetterFn mGetter;
+        catch (boost::bad_lexical_cast& e)
+        {
+          throw std::exception((boost::format("Unable to cast property to a string (error: %s)") % e.what()).str().c_str());
+          return "";
+        }
+        else
+          return "";
+      }
+
+    protected:
+      SetterFn mSetter;
+      GetterFn mGetter;
     };
 
     class GRIS_GSTD_API DynamicProperty
@@ -117,9 +163,12 @@ namespace gris {
         /** \brief This function declares a parameter \e name, and specifies the \e setter and \e getter functions. */
         template<typename T>
         void declareProperty(const std::string& name, const typename Property<T>::SetterFn& setter,
-          const typename Property<T>::GetterFn& getter)
+          const typename Property<T>::GetterFn& getter, const PropertyDefinition* propdef = nullptr)
         {
-          mProperties.insert(std::make_pair(name, std::make_unique<Property<T>>(setter, getter)));
+          mProperties.insert(
+            std::make_pair(name, 
+              std::make_unique<Property<T>>(setter, getter, 
+                propdef ? propdef : Property<T>::DEFAULT_DEFINITION())));
         }
 
         /** \brief Add a parameter to the set */
@@ -160,6 +209,8 @@ namespace gris {
 
         /** \brief Print the parameters to a stream */
         void printProperties(std::ostream &out) const;
+
+        IProperty& operator[](const std::string& name);
                         
       private:
         using PropertyMap = std::map<std::string, std::shared_ptr<IProperty>>;

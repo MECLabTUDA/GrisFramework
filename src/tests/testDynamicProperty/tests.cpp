@@ -1,6 +1,7 @@
 #include "private/test.pch"
 #include "tests.h"
 #include "TestClass.h"
+#include "ContainerStreamOperators.h"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -12,6 +13,16 @@ using namespace gris::gstd;
 
 namespace gris
 {
+  std::string testContainerOp(const std::string& in)
+  {
+    std::istringstream ss1(in);
+    std::vector<std::string> vec;
+    ss1 >> vec;
+    std::ostringstream ss2;
+    ss2 << vec;
+    return ss2.str();
+  }
+
   /**
   */
   void showProperties()

@@ -248,11 +248,23 @@ function(_gris_copy_target_files current_target target deploy_dir dir_name)
   add_custom_command(TARGET ${current_target} PRE_LINK 
     COMMAND ${CMAKE_COMMAND} -E make_directory "${deploy_dir}")
 # copy the files
+  #add_custom_command(TARGET ${current_target} POST_BUILD 
+  #  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  #    "\"$<TARGET_FILE:${target}>\"" "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
+  #  COMMENT "Copying Target ${target} to deploy directory ${dir_name}"
+  #  )
+  get_property(tgt_type TARGET "${current_target}" PROPERTY TYPE)
+  if(WIN32 AND MSVC AND (${tgt_type} STREQUAL SHARED_LIBRARY OR ${tgt_type} STREQUAL EXECUTABLE))
+# PDB_OUTPUT_DIRECTORY does not suppport generator expressions in cmake 3.8
+# c.f. https://gitlab.kitware.com/cmake/cmake/issues/16365
+# set_property(TARGET "${current_target}" PROPERTY PDB_OUTPUT_DIRECTORY "${deploy_dir}")
   add_custom_command(TARGET ${current_target} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      "\"$<TARGET_FILE:${target}>\"" "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
+      "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
     COMMENT "Copying Target ${target} to deploy directory ${dir_name}"
     )
+  endif()
+  set_property(TARGET "${current_target}" PROPERTY RUNTIME_OUTPUT_DIRECTORY "${deploy_dir}")
 endfunction()
 
 function(gris_set_lib_install target directory)

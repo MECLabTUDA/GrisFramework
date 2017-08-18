@@ -23,6 +23,9 @@ BOOST_AUTO_TEST_CASE( test_case_DynamicProperty )
 {
   BOOST_CHECK_NO_THROW(gris::showProperties());
 
+  std::string TestString{ "[Test,abc\\,def,\\\\]" };
+  BOOST_CHECK_EQUAL(gris::testContainerOp(TestString), TestString);
+
   BOOST_CHECK_NO_THROW(gris::testDouble());
   BOOST_CHECK_NO_THROW(gris::testInt());
   BOOST_CHECK_NO_THROW(gris::testSize_t());

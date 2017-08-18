@@ -31,6 +31,7 @@ namespace gstd {
     typedef std::function<Functor> Observer;
     typedef Observer* IdentifierType;
 
+  public:
     IObservable() = default;
     IObservable(const IObservable& other) = default;
     IObservable(IObservable&& other)
@@ -38,24 +39,44 @@ namespace gstd {
       mObservers = other.mObservers;
     }
 
+  public:
     void swap(IObservable& rhs)
     {
       mObservers.swap(rhs.mObservers);
     }
 
-		virtual IdentifierType registerObserver(const Event& event, Observer&& observer)
-		{
+  public:
+    static constexpr char* s_name() { return "IObservable Template"; }
+    virtual const char* name() const { return s_name(); }
+    virtual bool isA(const std::string& classname) const { return classname == s_name(); }
+  public:
+    virtual IdentifierType registerObserver(const Event& event, Observer&& observer)
+    {
       auto& v = mObservers[event];
       v.push_back(std::forward<Observer>(observer));
-      return static_cast<int>(&v.back());
-		}
+      return &v.back();
+    }
 
-		virtual IdentifierType registerObserver(Event&& event, Observer&& observer)
-		{
+    virtual IdentifierType registerObserver(Event&& event, Observer&& observer)
+    {
       auto& v = mObservers[std::move(event)];
       v.push_back(std::forward<Observer>(observer));
-      return static_cast<int>(&v.back());
-		}
+      return &v.back();
+    }
+
+    virtual IdentifierType registerObserver(const Event& event, Observer& observer)
+    {
+      auto& v = mObservers[event];
+      v.push_back(observer);
+      return &v.back();
+    }
+
+    virtual IdentifierType registerObserver(Event&& event, Observer& observer)
+    {
+      auto& v = mObservers[std::move(event)];
+      v.push_back(observer);
+      return &v.back();
+    }
 
     void unregisterObserver(const Event& event, const IdentifierType identifier)
     {
