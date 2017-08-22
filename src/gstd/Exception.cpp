@@ -13,8 +13,8 @@ namespace gstd
     , mMessage(message)
     , std::exception()
   {
-    std::ostringstream oss (mFunction);
-    oss << " (" << mLine << "): " << mMessage;
+    std::ostringstream oss;
+    oss << mFilename << ":" << mLine << " [" << mFunction << "]:" << std::endl << indent(mMessage) << std::endl;
     mFormattedMessage = oss.str();
   }
 
@@ -31,6 +31,19 @@ namespace gstd
   const char * Exception::what() const
   {
     return mFormattedMessage.c_str();
+  }
+
+  std::string Exception::indent(const std::string & text)
+  {
+    std::stringstream out;
+    out << "  ";
+    for (auto it = text.begin(); it != text.end(); ++it)
+    {
+      out << *it;
+      if (*it == '\n')
+        out << "  ";
+    }
+    return out.str();
   }
 
 }

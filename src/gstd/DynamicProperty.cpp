@@ -105,7 +105,8 @@ namespace gris
 
     std::vector<std::string>  DynamicProperty::propertyNames() const
     {
-      std::vector<std::string>  props(mProperties.size());
+      std::vector<std::string>  props;
+      props.reserve(mProperties.size());
       for (PropertyMap::const_iterator it = mProperties.begin(); it != mProperties.end(); ++it)
         props.push_back(it->first);
       return props;

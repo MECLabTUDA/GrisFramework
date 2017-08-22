@@ -41,7 +41,7 @@ endif()
 
 option(BUILD_Testing "enable tests" OFF)
 
-
+OPTION(GrisFramework_USE_JSON "enable JSON interfaces" OFF)
 
 set(Boost_NO_BOOST_CMAKE ON)
 set(BOOST_ROOT "${SDK_BASEPATH}/boost_1_59_0" CACHE PATH "Boost root directory")
@@ -55,6 +55,12 @@ gris_boost_find_and_fix("1.59")
 
 set(LOKI_DIR "${SDK_BASEPATH}/loki-0.1.7"  CACHE PATH "LOKI directory")
 find_package(LOKI)
+
+if(${GrisFramework_USE_JSON})
+  find_package(RapidJSON)
+  set(RapidJSON_DIR "${SDK_BASEPATH}/RapidJSON/lib/cmake/RapidJSON" CACHE PATH "RapidJSON config directory")
+endif()
+
 
 gris_pugixml_find_and_fix()
 

@@ -50,6 +50,8 @@ namespace gstd
     const char*                  function() const   { return mFunction.c_str(); }
     const char*                  file()     const   { return mFilename.c_str(); }
 
+  public:
+    static std::string indent(const std::string& text);
   private:
     std::string mFilename;
     std::string mMessage;
