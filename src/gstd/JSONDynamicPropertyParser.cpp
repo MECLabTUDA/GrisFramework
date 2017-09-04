@@ -10,6 +10,8 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+// english language parse errors
+#include "rapidjson/error/en.h"
 
 // boost strings
 #include <boost/algorithm/string.hpp>
@@ -149,7 +151,24 @@ void JSONDynamicPropertyParser::readFile(const boost::filesystem::path& filename
   mp->Document = rapidjson::Document();
   std::ifstream ifs(filename.string());
   rapidjson::IStreamWrapper isw(ifs);
-  mp->Document.ParseStream(isw);
+  rapidjson::ParseResult parseResult = mp->Document.ParseStream(isw);
+
+  if (!parseResult)
+  {
+    size_t startPos = std::max(size_t(0), parseResult.Offset() - 10);
+    size_t endPos = parseResult.Offset() + 10;
+    ifs.seekg(startPos);
+    char buffer[20];
+    ifs.read(buffer, endPos - startPos);
+    std::string strBuffer(buffer);
+    size_t errorPos = startPos - parseResult.Offset();
+
+    // parsing was not successful, but RapidJSON did not throw an exception
+    throw GSTD_EXCEPTION_FORMAT("JSON parse error: %s (Position: %u, around `%s*%s` at *)",
+      rapidjson::GetParseError_En(parseResult.Code()) % parseResult.Offset(),
+      strBuffer.substr(0, errorPos) % strBuffer.substr(errorPos) );
+  }
+
   // down-cast the root node
   mp->pCurrentNode = &mp->Document;
 }
