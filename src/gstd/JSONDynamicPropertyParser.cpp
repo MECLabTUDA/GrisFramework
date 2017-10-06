@@ -165,7 +165,7 @@ void JSONDynamicPropertyParser::readFile(const boost::filesystem::path& filename
 
     // parsing was not successful, but RapidJSON did not throw an exception
     throw GSTD_EXCEPTION_FORMAT("JSON parse error: %s (Position: %u, around `%s*%s` at *)",
-      rapidjson::GetParseError_En(parseResult.Code()) % parseResult.Offset(),
+      rapidjson::GetParseError_En(parseResult.Code()) % parseResult.Offset() %
       strBuffer.substr(0, errorPos) % strBuffer.substr(errorPos) );
   }
 

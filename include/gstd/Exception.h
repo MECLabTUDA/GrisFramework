@@ -50,6 +50,9 @@ namespace gstd
     const char*                  function() const   { return mFunction.c_str(); }
     const char*                  file()     const   { return mFilename.c_str(); }
 
+    void                         prepend(const std::string& s);
+    void                         append(const std::string& s);
+
     void                         reformatString();
 
   public:

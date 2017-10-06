@@ -31,6 +31,18 @@ namespace gstd
     return mFormattedMessage.c_str();
   }
 
+  void Exception::prepend(const std::string & s)
+  {
+    mMessage = s + mMessage;
+    reformatString();
+  }
+
+  void Exception::append(const std::string & s)
+  {
+    mMessage += s;
+    reformatString();
+  }
+
   void Exception::reformatString()
   {
     std::ostringstream oss;
