@@ -14,7 +14,10 @@ namespace gris
       explicit Vector<T, S, DIM>(const T& val) : BaseVector<T,DIM>(val) {}
       explicit Vector<T, S, DIM>(const T* d)   : BaseVector<T,DIM>(d) {}
 
+
+      template<typename = std::enable_if_t<DIM == 2>>
       Vector<T, S, DIM>(T x, T y)       : BaseVector<T,DIM>(x,y) {}
+      template<typename = std::enable_if_t<DIM == 3>>
       Vector<T, S, DIM>(T x, T y, T z)  : BaseVector<T,DIM>(x,y,z) {}
 
     // ------ functions for natural/integer scalars ------ //    

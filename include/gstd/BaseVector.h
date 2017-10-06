@@ -6,7 +6,7 @@
 
 namespace gris
 {
-  template<typename T, typename size_t DIM>
+  template<typename T, size_t DIM>
   class BaseVector
   {
     public:
@@ -14,18 +14,26 @@ namespace gris
       explicit BaseVector<T, DIM>(const T& val) { coeff.fill(val);  }
       explicit BaseVector<T, DIM>(const T* d)   { for(size_t i(0); i<DIM; ++i) coeff[i] = d[i]; }
 
-      BaseVector<T, DIM>(T x, T y)        { assert(DIM==2); coeff[0] = x; coeff[1] = y; }
-      BaseVector<T, DIM>(T x, T y, T z)   { assert(DIM==3); coeff[0] = x; coeff[1] = y; coeff[2] = z; }
+      template<typename = std::enable_if_t<DIM == 2>>
+      BaseVector<T, DIM>(T x, T y)        { coeff[0] = x; coeff[1] = y; }
+      template<typename = std::enable_if_t<DIM == 3>>
+      BaseVector<T, DIM>(T x, T y, T z)   { coeff[0] = x; coeff[1] = y; coeff[2] = z; }
       
     public:
       T&        operator[](std::size_t idx)       { return coeff[idx]; }
       const T&  operator[](std::size_t idx) const { return coeff[idx]; }
 
+      template<typename = std::enable_if_t<(DIM > 0)>>
       T&        x()       { return coeff[0]; }
+      template<typename = std::enable_if_t<(DIM > 0)>>
       const T&  x() const { return coeff[0]; }
+      template<typename = std::enable_if_t<(DIM > 1)>>
       T&        y()       { return coeff[1]; }
+      template<typename = std::enable_if_t<(DIM > 1)>>
       const T&  y() const { return coeff[1]; }
+      template<typename = std::enable_if_t<(DIM > 2)>>
       T&        z()       { return coeff[2]; }
+      template<typename = std::enable_if_t<(DIM > 2)>>
       const T&  z() const { return coeff[2]; }
       T*        data()        { return coeff.data(); }
       const T*  data() const  { return coeff.data(); } 
