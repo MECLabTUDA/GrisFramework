@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-#include "Exception.h"
+#include "DynamicPropertyException.h"
 
 namespace gris
 {
@@ -112,6 +112,11 @@ namespace gris
       return props;
     }
 
+    std::string DynamicProperty::propertyString(const std::string & key) const
+    {
+      return operator[](key).getValue();
+    }
+
     void DynamicProperty::getPropertyValues(std::vector<std::string> &vals) const
     {
       std::vector<std::string> names;
@@ -126,6 +131,16 @@ namespace gris
       return mProperties;
     }
 
+    DynamicProperty::PropertyMap::const_iterator DynamicProperty::begin() const
+    {
+      return mProperties.begin();
+    }
+
+    DynamicProperty::PropertyMap::const_iterator DynamicProperty::end() const
+    {
+      return mProperties.end();
+    }
+
     bool DynamicProperty::hasProperty(const std::string &key) const
     {
       return mProperties.find(key) != mProperties.end();
@@ -133,12 +148,11 @@ namespace gris
 
     void DynamicProperty::includeProperty(const DynamicProperty &other, const std::string &prefix)
     {
-      const PropertyMap &p = other.getPropertyMap();
-      if (prefix.empty())
-        for (PropertyMap::const_iterator it = p.begin() ; it != p.end() ; ++it)
+      const PropertyMap &p = other.mProperties;
+      for (PropertyMap::const_iterator it = p.begin() ; it != p.end() ; ++it)
+        if (prefix.empty())
           mProperties[it->first] = it->second;
-      else
-        for (PropertyMap::const_iterator it = p.begin() ; it != p.end() ; ++it)
+        else
           mProperties[prefix + "." + it->first] = it->second;
     }
 
@@ -158,13 +172,24 @@ namespace gris
         out << it->first << " = " << it->second->getValue() << std::endl;
     }
 
-    IProperty & DynamicProperty::operator[](const std::string & name)
+    IProperty& DynamicProperty::operator[](const std::string & key)
     {
-      auto it = mProperties.find(name);
+      auto it = mProperties.find(key);
       if (it == mProperties.end())
-        throw GSTD_EXCEPTION_FORMAT("The property '%s' does not exist.", name);
+        throw EXCEPTION(DynamicPropertyException,
+          DynamicPropertyException::KEY_DOES_NOT_EXIST,
+          "The key `" + key + "` does not exist.");
+      return *it->second;
+    }
 
-      return *(it->second);
+    const IProperty& DynamicProperty::operator[](const std::string & key) const
+    {
+      auto it = mProperties.find(key);
+      if (it == mProperties.end())
+        throw EXCEPTION(DynamicPropertyException,
+          DynamicPropertyException::KEY_DOES_NOT_EXIST,
+          "The key `" + key + "` does not exist.");
+      return *it->second;
     }
 
     PropertyDefinition::PropertyDefinition(const EnHints hint, const char * descriptor)

@@ -5,6 +5,7 @@ set(INC_DIR
 
 set(Includes
   ${INC_DIR}ContainerStreamOperators.h
+  ${INC_DIR}DynamicPropertyException.h
   ${INC_DIR}BaseVector.h
   ${INC_DIR}Exception.h
   ${INC_DIR}VectorImpl.h
@@ -28,6 +29,7 @@ set(Private_Includes
   )	
 set(Sources	
   DynamicProperty.cpp
+  DynamicPropertyException.cpp
   Exception.cpp
   IDynamicPropertyParser.cpp
   DynamicPropertyManager.cpp
@@ -59,7 +61,7 @@ gris_configure_resource_rc(Resources GrisFramework std ${PROJECT_NAME})
 
 gris_boost_find_and_fix("1.59" COMPONENTS "filesystem")
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} ${GrisFramework_LIBTYPE}
   ${Includes}
   ${Private_Includes}
   ${Sources}
