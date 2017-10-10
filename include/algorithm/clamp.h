@@ -2,6 +2,8 @@
 
 #include "algorithm_api.h"
 
+#include <cassert>
+
 namespace gris {
 
   // same as std::clamp in C++17

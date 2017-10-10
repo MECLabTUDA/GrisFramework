@@ -75,10 +75,13 @@ function(gris_deploy target sub)
   _gris_prefix_folder(install_dir "${sub}" "${base}")
   _gris_prefix_folder(deploy_dir "${sub}" "${dest}")
   
-  _gris_copy_target_files(${target} ${target} "${deploy_dir}" "${install_dir}")
-  
+  get_property(tgt_type TARGET ${target} PROPERTY TYPE)
+  IF(tgt_type STREQUAL SHARED_LIBRARY OR tgt_type STREQUAL EXECUTABLE)
+    _gris_copy_target_files(${target} ${target} "${deploy_dir}" "${install_dir}")
+    
 # clean the directory from deploy folder
-  _gris_add_clean_directory("${deploy_dir}" "${install_dir}")
+    _gris_add_clean_directory("${deploy_dir}" "${install_dir}")
+  ENDIF()
   
 # TYPE STATIC_LIBRARY, MODULE_LIBRARY, SHARED_LIBRARY, INTERFACE_LIBRARY, EXECUTABLE
   set_property(TARGET ${target} PROPERTY DEPLOY_DIRECTORY "${deploy_base}")
@@ -89,9 +92,13 @@ function(gris_deploy target sub)
       RUNTIME DESTINATION "${install_dir}" 
       ARCHIVE DESTINATION "${lib_install_dir}"
       LIBRARY DESTINATION "${lib_install_dir}")
-    IF(MSVC)
+    IF(MSVC AND tgt_type STREQUAL SHARED_LIBRARY)
       INSTALL(FILES "$<TARGET_PDB_FILE:${target}>" OPTIONAL DESTINATION "${install_dir}")
     ENDIF()
+  ENDIF()
+  IF(tgt_type STREQUAL SHARED_LIBRARY)
+    SET_PROPERTY(TARGET ${target} APPEND PROPERTY COMPILE_DEFINITIONS "${target}_SHARED")
+    SET_PROPERTY(TARGET ${target} APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS "${target}_SHARED")
   ENDIF()
 endfunction()
 
@@ -245,11 +252,23 @@ function(_gris_copy_target_files current_target target deploy_dir dir_name)
   add_custom_command(TARGET ${current_target} PRE_LINK 
     COMMAND ${CMAKE_COMMAND} -E make_directory "${deploy_dir}")
 # copy the files
+  #add_custom_command(TARGET ${current_target} POST_BUILD 
+  #  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+  #    "\"$<TARGET_FILE:${target}>\"" "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
+  #  COMMENT "Copying Target ${target} to deploy directory ${dir_name}"
+  #  )
+  get_property(tgt_type TARGET "${current_target}" PROPERTY TYPE)
+  if(WIN32 AND MSVC AND (${tgt_type} STREQUAL SHARED_LIBRARY OR ${tgt_type} STREQUAL EXECUTABLE))
+# PDB_OUTPUT_DIRECTORY does not suppport generator expressions in cmake 3.8
+# c.f. https://gitlab.kitware.com/cmake/cmake/issues/16365
+# set_property(TARGET "${current_target}" PROPERTY PDB_OUTPUT_DIRECTORY "${deploy_dir}")
   add_custom_command(TARGET ${current_target} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      "\"$<TARGET_FILE:${target}>\"" "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
+      "$<$<OR:$<CONFIG:RelWithDebInfo>,$<CONFIG:Debug>>:\"$<TARGET_PDB_FILE:${target}>\">" "\"${deploy_dir}\""
     COMMENT "Copying Target ${target} to deploy directory ${dir_name}"
     )
+  endif()
+  set_property(TARGET "${current_target}" PROPERTY RUNTIME_OUTPUT_DIRECTORY "${deploy_dir}")
 endfunction()
 
 function(gris_set_lib_install target directory)

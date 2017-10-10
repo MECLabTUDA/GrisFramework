@@ -14,7 +14,10 @@ namespace gris
       explicit Vector<T, S, DIM>(const T& val) : BaseVector<T,DIM>(val) {}
       explicit Vector<T, S, DIM>(const T* d)   : BaseVector<T,DIM>(d) {}
 
+
+      template<typename = std::enable_if_t<DIM == 2>>
       Vector<T, S, DIM>(T x, T y)       : BaseVector<T,DIM>(x,y) {}
+      template<typename = std::enable_if_t<DIM == 3>>
       Vector<T, S, DIM>(T x, T y, T z)  : BaseVector<T,DIM>(x,y,z) {}
 
     // ------ functions for natural/integer scalars ------ //    
@@ -163,6 +166,40 @@ namespace gris
           coeff[1]*o.coeff[2] - o.coeff[1]*coeff[2],
           coeff[2]*o.coeff[0] - coeff[0]*o.coeff[2], 
           coeff[0]*o.coeff[1] - coeff[1]*o.coeff[0]);
+      }
+
+      template<typename = std::enable_if_t<DIM == 2 || DIM == 3>>
+      Vector<T, S, DIM> cartesianToPolar() const
+      {
+        Vector<T, S, DIM> r = *this;
+        r[0] = sqrt(std::pow(data[0], 2) + std::pow(data[1], 2));
+        r[1] = atan2(data[1], data[0]);
+      }
+
+      template<typename = std::enable_if_t<DIM == 3>>
+      Vector<T, S, DIM> cartesianToSpherical() const
+      {
+        Vector<T, S, DIM> r = *this;
+        r[0] = sqrt(std::pow(data[0], 2) + std::pow(data[1], 2) + std::pow(data[2], 2));
+        r[1] = acos(data[2] / r[0]);
+        r[2] = atan2(data[1] / data[0]);
+      }
+
+      template<typename = std::enable_if_t<DIM == 2 || DIM == 3>>
+      Vector<T, S, DIM> polarToCartesian() const
+      {
+        Vector<T, S, DIM> r = *this;
+        r[0] = data[0] * cos(data[1]);
+        r[1] = data[0] * sin(data[1]);
+      }
+
+      template<typename = std::enable_if_t<DIM == 3>>
+      Vector<T, S, DIM> sphericalToCartesian() const
+      {
+        Vector<T, S, DIM> r = *this;
+        r[0] = data[0] * sin(data[1]) * cos(data[2]);
+        r[1] = data[0] * sin(data[1]) * sin(data[2]);
+        r[2] = data[0] * cos(data[1]);
       }
   };
 }

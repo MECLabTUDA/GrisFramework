@@ -5,13 +5,50 @@
 #include <stdlib.h>
 #include <algorithm>
 
+#include "DynamicPropertyException.h"
+
 namespace gris
 {
   namespace gstd
   {
+
+    const PropertyDefinition IProperty::DEFAULTS[5] = 
+    {
+      { PropertyDefinition::Unknown, ""},
+      { PropertyDefinition::String, "" },
+      { PropertyDefinition::Boolean, "" },
+      { PropertyDefinition::Float, "" },
+      { PropertyDefinition::Integer, "" }
+    };
+
+    template <> 
+    const PropertyDefinition* Property<double>::DEFAULT_DEFINITION()
+    {
+      return &DEFAULTS[3];
+    }
+
+    template <>
+    const PropertyDefinition* Property<int>::DEFAULT_DEFINITION()
+    {
+      return &DEFAULTS[4];
+    }
+
+    template <>
+    const PropertyDefinition* Property<std::string>::DEFAULT_DEFINITION()
+    {
+      return &DEFAULTS[1];
+    }
+
+    template <>
+    const PropertyDefinition* Property<bool>::DEFAULT_DEFINITION()
+    {
+      return &DEFAULTS[0];
+    }
+
     /**
     */
-    IProperty::IProperty()
+    IProperty::IProperty(const PropertyDefinition& propdef)
+      : mPropertyDefinition(propdef)
     {
     }
 
@@ -68,10 +105,16 @@ namespace gris
 
     std::vector<std::string>  DynamicProperty::propertyNames() const
     {
-      std::vector<std::string>  props(mProperties.size());
+      std::vector<std::string>  props;
+      props.reserve(mProperties.size());
       for (PropertyMap::const_iterator it = mProperties.begin(); it != mProperties.end(); ++it)
         props.push_back(it->first);
       return props;
+    }
+
+    std::string DynamicProperty::propertyString(const std::string & key) const
+    {
+      return operator[](key).getValue();
     }
 
     void DynamicProperty::getPropertyValues(std::vector<std::string> &vals) const
@@ -88,6 +131,16 @@ namespace gris
       return mProperties;
     }
 
+    DynamicProperty::PropertyMap::const_iterator DynamicProperty::begin() const
+    {
+      return mProperties.begin();
+    }
+
+    DynamicProperty::PropertyMap::const_iterator DynamicProperty::end() const
+    {
+      return mProperties.end();
+    }
+
     bool DynamicProperty::hasProperty(const std::string &key) const
     {
       return mProperties.find(key) != mProperties.end();
@@ -95,12 +148,11 @@ namespace gris
 
     void DynamicProperty::includeProperty(const DynamicProperty &other, const std::string &prefix)
     {
-      const PropertyMap &p = other.getPropertyMap();
-      if (prefix.empty())
-        for (PropertyMap::const_iterator it = p.begin() ; it != p.end() ; ++it)
+      const PropertyMap &p = other.mProperties;
+      for (PropertyMap::const_iterator it = p.begin() ; it != p.end() ; ++it)
+        if (prefix.empty())
           mProperties[it->first] = it->second;
-      else
-        for (PropertyMap::const_iterator it = p.begin() ; it != p.end() ; ++it)
+        else
           mProperties[prefix + "." + it->first] = it->second;
     }
 
@@ -120,5 +172,31 @@ namespace gris
         out << it->first << " = " << it->second->getValue() << std::endl;
     }
 
-  }
+    IProperty& DynamicProperty::operator[](const std::string & key)
+    {
+      auto it = mProperties.find(key);
+      if (it == mProperties.end())
+        throw EXCEPTION(DynamicPropertyException,
+          DynamicPropertyException::KEY_DOES_NOT_EXIST,
+          "The key `" + key + "` does not exist.");
+      return *it->second;
+    }
+
+    const IProperty& DynamicProperty::operator[](const std::string & key) const
+    {
+      auto it = mProperties.find(key);
+      if (it == mProperties.end())
+        throw EXCEPTION(DynamicPropertyException,
+          DynamicPropertyException::KEY_DOES_NOT_EXIST,
+          "The key `" + key + "` does not exist.");
+      return *it->second;
+    }
+
+    PropertyDefinition::PropertyDefinition(const EnHints hint, const char * descriptor)
+      : mHint(hint)
+      , mDescriptor(descriptor)
+    {
+    }
+
+}
 }

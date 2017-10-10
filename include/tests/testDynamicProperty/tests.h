@@ -1,8 +1,12 @@
 #pragma once
 
+#include <string>
+
 namespace gris
 {
   void showProperties();
+
+  std::string testContainerOp(const std::string& s);
 
   void testDouble();
   void testInt();

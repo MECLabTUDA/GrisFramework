@@ -21,6 +21,7 @@ function(gris_configure_resource_rc GeneratedFile ProductName ProductSubName Mod
 # ProductSubName being the Product Component name,
 # ModuleName being the "main target name"
 
+IF(${ProductName}_LIBTYPE STREQUAL "SHARED")
 if(WIN32)
 # prepare the Version information
   _gris_derive_version_helper(${ProductName} ${ModuleName} "MAJOR")
@@ -50,4 +51,7 @@ if(WIN32)
   configure_file("${GrisFramework_CMAKE_DIR}/resource.rc.in" "resource.rc")
   set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/resource.rc" PROPERTIES)
 endif()
+ELSE()
+  MESSAGE(FATAL_ERROR "No Library Type defined for ${ProductName}. This is typically due to no Version being defined.")
+ENDIF()
 endfunction()
