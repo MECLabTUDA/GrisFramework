@@ -39,6 +39,12 @@ JSONDynamicPropertyParser::JSONDynamicPropertyParser()
 {
 }
 
+JSONDynamicPropertyParser::JSONDynamicPropertyParser(const bool pretty)
+  : JSONDynamicPropertyParser()
+{
+  mPretty = pretty;
+}
+
 JSONDynamicPropertyParser::~JSONDynamicPropertyParser()
 {
   flush();

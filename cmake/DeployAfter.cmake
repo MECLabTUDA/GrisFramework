@@ -87,7 +87,8 @@ function(gris_deploy target sub)
   set_property(TARGET ${target} PROPERTY DEPLOY_DIRECTORY "${deploy_base}")
   set_property(TARGET ${target} PROPERTY INSTALL_DIRECTORY "${base}")
   set_property(TARGET ${target} PROPERTY MAIN_DEPLOY_SUBDIRECTORY "${sub}")
-  IF(GRIS_INSTALL_DEPLOYED)
+  GET_PROPERTY(_INSTALL_BLOCKER TARGET ${target} PROPERTY DO_NOT_INSTALL)
+  IF(GRIS_INSTALL_DEPLOYED AND NOT _INSTALL_BLOCKER)
     INSTALL(TARGETS ${target} EXPORT ${GRIS_INSTALL_EXPORT} 
       RUNTIME DESTINATION "${install_dir}" 
       ARCHIVE DESTINATION "${lib_install_dir}"
