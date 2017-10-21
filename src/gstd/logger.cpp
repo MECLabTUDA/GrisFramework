@@ -119,23 +119,27 @@ namespace gris
   /**
   */
   void Logger::flush()
-  {    
+  {
     for (auto& pOut : mpStreams)
     {
-      if(pOut)
+      if (pOut)
         *pOut << mBuffer.str();
     }
-
     for (auto& pOut : mpCallbacks)
     {
-      if(pOut)
+      if (pOut)
         pOut->stream(mBuffer.str().c_str());
     }
-
-    std::cout << mBuffer.str();
-    mOfs.open("log.txt", std::ios_base::app);
-    mOfs << mBuffer.str();
-    mOfs.close();
+    if (mUseCout)
+    {
+      std::cout << mBuffer.str();
+    }
+    if (mUseLogFile)
+    {
+      mOfs.open("log.txt", std::ios_base::app);
+      mOfs << mBuffer.str();
+      mOfs.close();
+    }
     mBuffer.str("");
   }
 
