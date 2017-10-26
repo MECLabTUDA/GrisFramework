@@ -116,7 +116,7 @@ void JSONDynamicPropertyParser::readImpl(DynamicProperty & prop)
     }
     else // the child is missing in the XML, do not change the value
       appendWarning("The Value for the Property `" + trueName + "` " +
-        "was missing in the XML-file.");
+        "was missing in the XML-file `" + filename().string() + "`.");
   }
 }
 
@@ -143,7 +143,7 @@ void JSONDynamicPropertyParser::writeImpl(const DynamicProperty & prop)
       jsonPtr = &mp->pCurrentNode->AddMember(
         rapidjson::Value(trueName, mp->Document.GetAllocator()), 
         rapidjson::kNullType, 
-        mp->Document.GetAllocator());
+        mp->Document.GetAllocator())[trueName];
     else jsonPtr = &Iter->value;
     if (p->hint() == PropertyDefinition::Float)
     {
