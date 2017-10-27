@@ -5,7 +5,6 @@
 #include "Vector.h"
 
 // rapidjson
-#define RAPIDJSON_HAS_STDSTRING 1
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
@@ -141,7 +140,7 @@ void JSONDynamicPropertyParser::writeImpl(const DynamicProperty & prop)
     decltype(mp->pCurrentNode) jsonPtr;
     if (Iter == mp->pCurrentNode->MemberEnd())
       jsonPtr = &mp->pCurrentNode->AddMember(
-        rapidjson::Value(trueName, mp->Document.GetAllocator()), 
+        rapidjson::Value(trueName.c_str(), trueName.size(), mp->Document.GetAllocator()), 
         rapidjson::kNullType, 
         mp->Document.GetAllocator())[trueName];
     else jsonPtr = &Iter->value;
@@ -167,8 +166,16 @@ void JSONDynamicPropertyParser::writeImpl(const DynamicProperty & prop)
           jsonPtr->PushBack(std::remove_pointer_t<decltype(jsonPtr)>(vec[i]), 
             mp->Document.GetAllocator());
     }
-    else 
-      Iter->value.SetString(p->getValue(), mp->Document.GetAllocator());
+    else
+    {
+      auto s = p->getValue();
+      jsonPtr->SetString(s.c_str(), s.size(), mp->Document.GetAllocator());
+    }
+    //{ // Print current file to screen
+    //  rapidjson::StringBuffer json;
+    //  mp->pCurrentNode->Accept(rapidjson::Writer<rapidjson::StringBuffer>(json));
+    //  std::cout << trueName << ": " << json.GetString() << std::endl;
+    //}
     mFileChanged = true;
   }
 }

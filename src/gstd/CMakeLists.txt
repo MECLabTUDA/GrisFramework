@@ -78,6 +78,9 @@ if(${GrisFramework_USE_JSON})
   target_include_directories(${PROJECT_NAME} PRIVATE
     ${RapidJSON_INCLUDE_DIR}
     )
+  TARGET_COMPILE_DEFINITIONS(${PROJECT_NAME} PRIVATE
+    RAPIDJSON_HAS_STDSTRING
+  )
 endif()
 
 #private includes
