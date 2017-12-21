@@ -144,8 +144,7 @@ namespace gris
   */
   void XmlNode::setValue(const char* val)
   {
-    mp->node.set_value(val);
-    mp->node.append_child(pugi::node_pcdata).set_value(val);
+    mp->node.text().set(val);
   }
 
   /**
