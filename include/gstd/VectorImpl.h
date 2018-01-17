@@ -20,6 +20,9 @@ namespace gris
       template<typename = std::enable_if_t<DIM == 3>>
       Vector<T, S, DIM>(T x, T y, T z)  : BaseVector<T,DIM>(x,y,z) {}
 
+      template<typename T_, typename S_>
+      Vector<T, S, DIM>(const Vector<T_, S_, DIM>& other) : BaseVector<T, DIM>(other) {}
+
     // ------ functions for natural/integer scalars ------ //    
     public:
       Vector<T, S, DIM>& operator+=(const Vector<T, S, DIM>& rhs)
@@ -172,34 +175,38 @@ namespace gris
       Vector<T, S, DIM> cartesianToPolar() const
       {
         Vector<T, S, DIM> r = *this;
-        r[0] = sqrt(std::pow(data[0], 2) + std::pow(data[1], 2));
-        r[1] = atan2(data[1], data[0]);
+        r[0] = sqrt(std::pow(coeff[0], 2) + std::pow(coeff[1], 2));
+        r[1] = atan2(coeff[1], coeff[0]);
+        return r;
       }
 
       template<typename = std::enable_if_t<DIM == 3>>
       Vector<T, S, DIM> cartesianToSpherical() const
       {
         Vector<T, S, DIM> r = *this;
-        r[0] = sqrt(std::pow(data[0], 2) + std::pow(data[1], 2) + std::pow(data[2], 2));
-        r[1] = acos(data[2] / r[0]);
-        r[2] = atan2(data[1] / data[0]);
+        r[0] = sqrt(std::pow(coeff[0], 2) + std::pow(coeff[1], 2) + std::pow(coeff[2], 2));
+        r[1] = acos(coeff[2] / r[0]);
+        r[2] = atan2(coeff[1] / coeff[0]);
+        return r;
       }
 
       template<typename = std::enable_if_t<DIM == 2 || DIM == 3>>
       Vector<T, S, DIM> polarToCartesian() const
       {
         Vector<T, S, DIM> r = *this;
-        r[0] = data[0] * cos(data[1]);
-        r[1] = data[0] * sin(data[1]);
+        r[0] = coeff[0] * cos(coeff[1]);
+        r[1] = coeff[0] * sin(coeff[1]);
+        return r;
       }
 
       template<typename = std::enable_if_t<DIM == 3>>
       Vector<T, S, DIM> sphericalToCartesian() const
       {
         Vector<T, S, DIM> r = *this;
-        r[0] = data[0] * sin(data[1]) * cos(data[2]);
-        r[1] = data[0] * sin(data[1]) * sin(data[2]);
-        r[2] = data[0] * cos(data[1]);
+        r[0] = coeff[0] * sin(coeff[1]) * cos(coeff[2]);
+        r[1] = coeff[0] * sin(coeff[1]) * sin(coeff[2]);
+        r[2] = coeff[0] * cos(coeff[1]);
+        return r;
       }
   };
 }
