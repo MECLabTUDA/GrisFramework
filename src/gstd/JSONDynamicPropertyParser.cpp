@@ -230,13 +230,13 @@ void JSONDynamicPropertyParser::readFile(const boost::filesystem::path& filename
 
   if (!parseResult)
   {
-    size_t startPos = std::max(size_t(0), parseResult.Offset() - 10);
-    size_t endPos = parseResult.Offset() + 10;
+    size_t startPos = size_t(std::max(int(0), int(parseResult.Offset()) - 25));
+    size_t endPos = parseResult.Offset() + 25;
     ifs.seekg(startPos);
-    char buffer[20];
+    char buffer[50];
     ifs.read(buffer, endPos - startPos);
     std::string strBuffer(buffer);
-    size_t errorPos = startPos - parseResult.Offset();
+    size_t errorPos =  parseResult.Offset()- startPos;
 
     // parsing was not successful, but RapidJSON did not throw an excepNoKey
     throw GSTD_EXCEPTION_FORMAT("JSON parse error: %s (Position: %u, around `%s*%s` at *)",

@@ -70,7 +70,6 @@ function(gris_bundle target)
   gris_get_dependent_libraries(_dep_targets ${target} TYPE SHARED_LIBRARY)
   foreach(_lib IN LISTS _dep_targets)
     gris_bundle_add_library(${_lib})
-    MESSAGE(${_lib})
   endforeach()
   IF(GRIS_INSTALL_DEPLOYED AND GRIS_INSTALL_BUNDLED)
     # install all libraries for tests
