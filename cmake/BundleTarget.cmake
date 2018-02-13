@@ -178,7 +178,6 @@ function(gris_bundle_add_library lib)
     get_property(_DEPLOY_DIRECTORY TARGET ${lib} PROPERTY DEPLOY_DIRECTORY)
     # if target is deployed via gris_deploy, use the 'deployed' version
     if(_DEPLOY_DIRECTORY)
-      MESSAGE("deploy")
       get_property(_MAIN_DEPLOY_SUBDIRECTORY TARGET ${lib} PROPERTY MAIN_DEPLOY_SUBDIRECTORY)
       IF(DEFINED ${target} AND TARGET ${target})
         get_property(tgt_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
@@ -194,7 +193,6 @@ function(gris_bundle_add_library lib)
         # ELSE: deployed to the correct folder anyways
         ENDIF()
       ELSE()
-        MESSAGE("no deploy")
         # instead of bundling through the build location, deploy to path
         _gris_prefix_folder(dir "${_MAIN_DEPLOY_SUBDIRECTORY}" "${_DEPLOY_DIRECTORY}")
         _gris_prefix_folder(dir "${dir}" "${CMAKE_BINARY_DIR}")
