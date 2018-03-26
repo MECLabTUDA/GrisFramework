@@ -11,19 +11,36 @@ using namespace std;
 
 int main(int argc, char ** argv)
 {
-  LOG << "blubb1" << std::endl;
-  TLOG << "blubb2" << std::endl;
-  //auto r = std::make_shared<GrisFileLogger>("logtest.txt");    
-  //THE_GRIS_LOGGER.add_ostream(&ss);
-  std::stringstream ss;
-  THE_GRIS_LOGGER.addStream(&ss);
-  LOG_LINE << "blubb line";
-  //THE_GRIS_LOGGER.remove_ostream(r);  
-  THE_GRIS_LOGGER.removeStream(&ss);
-  TLOG_LINE << "blubb line2";
-
-  cout << endl;
-  cout << endl;
-  cout << ss.str();
-
+  const std::string teststring = "test";
+  // cout
+  {
+    LOG_LINE << teststring;
+  }
+  // file
+  {
+    const std::string fn = "test.log";
+    GetGrisLogger().setCoutLogging(false);
+    GetGrisLogger().setFilename(fn);
+    GetGrisLogger().setFileLogging(true);
+    std::ifstream ifs(fn);
+    std::string line;
+    std::getline(ifs,line);
+    if (line != teststring)
+      std::cout << "ERROR during logging to file '" << fn << "': " << line << " != " << teststring << std::endl;
+    else
+      std::cout << "File logging successfull" << std::endl;
+  }
+  // stream logging
+  {
+    GetGrisLogger().setCoutLogging(false);
+    GetGrisLogger().setFileLogging(false);
+    std::stringstream ss;
+    GetGrisLogger().addStream(&ss);
+    LOG_LINE << teststring;
+    if (ss.str() != (teststring + "\n"))
+      std::cout << "ERROR during logging to stream: " << ss.str() << " != " << teststring + "\n" << std::endl;
+    else
+      std::cout << "stream logging successfull" << std::endl;
+    GetGrisLogger().removeStream(&ss);
+  }
 }
