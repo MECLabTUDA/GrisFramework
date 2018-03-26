@@ -61,7 +61,7 @@ if(${GrisFramework_USE_JSON})
   set(RapidJSON_DIR "${SDK_BASEPATH}/RapidJSON/lib/cmake/RapidJSON" CACHE PATH "RapidJSON config directory")
 endif()
 
-
+set(pugixml_DIR "${SDK_BASEPATH}/pugixml-1.7/lib/cmake/pugixml")
 gris_pugixml_find_and_fix()
 
 add_subdirectory(src)
