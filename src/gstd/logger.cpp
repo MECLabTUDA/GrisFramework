@@ -41,8 +41,10 @@ namespace gris
   /**
   */
   Logger::Logger()
+    : mFilename("log.txt")
+    , mUseLogFile(false)
+    , mUseCout(true)
   {
-    init();    
   }
 
   /**
@@ -59,8 +61,6 @@ namespace gris
   */
   void Logger::init()
   {
-    mOfs.open("log/log.txt", std::ios_base::trunc);
-    mOfs.close();
     printTimeStamp(); *this << ": -----------------------------------------------------\n";
     printTimeStamp(); *this << ": ------------------- New Log Started -----------------\n";
     printTimeStamp(); *this << ": -----------------------------------------------------\n";
@@ -98,8 +98,9 @@ namespace gris
   {
     auto iter = std::find(mpStreams.begin(), mpStreams.end(), pOut);
     if (iter!=mpStreams.end())
-      *this << "ostream removed\n";
-    mpStreams.erase(iter);
+    {
+      mpStreams.erase(iter);
+    }
   }
 
 
@@ -112,30 +113,60 @@ namespace gris
   {
     auto iter = std::find(mpCallbacks.begin(), mpCallbacks.end(), cb);
     if (iter!=mpCallbacks.end())
-      *this << "callback removed\n";
-    mpCallbacks.erase(iter);
+    {
+      mpCallbacks.erase(iter);
+    }
+  }
+
+  /**
+  */
+  void Logger::setFileLogging(bool b) 
+  {
+    mOfs.open(mFilename.c_str(), std::ios::app);
+    mUseLogFile = b; 
+  }
+
+  /**
+  */
+  void Logger::setFilename(const std::string& fn)
+  {
+    mFilename = fn;
+    if (mUseLogFile)
+    {
+      mOfs.close();
+      mOfs.open(mFilename.c_str(), std::ios::app);
+    }
   }
 
   /**
   */
   void Logger::flush()
-  {    
+  {
     for (auto& pOut : mpStreams)
     {
-      if(pOut)
+      if (pOut)
+      {
         *pOut << mBuffer.str();
+        //pOut->flush();
+      }
     }
-
     for (auto& pOut : mpCallbacks)
     {
-      if(pOut)
+      if (pOut)
+      {
         pOut->stream(mBuffer.str().c_str());
+      };
     }
-
-    std::cout << mBuffer.str();
-    mOfs.open("log.txt", std::ios_base::app);
-    mOfs << mBuffer.str();
-    mOfs.close();
+    if (mUseCout)
+    {
+      std::cout << mBuffer.str();
+      std::cout.flush();
+    }
+    if (mUseLogFile)
+    {
+      mOfs << mBuffer.str();
+      mOfs.flush();
+    }
     mBuffer.str("");
   }
 
