@@ -12,9 +12,9 @@ namespace gris
 
   /**
   */
-  void XmlAttribute::setValue(const char* val)
+  void XmlAttribute::setValue(const std::string& val)
   {
-    mAtt->set_value(val);
+    mAtt->set_value(val.c_str());
   }
 
   /**
@@ -26,9 +26,9 @@ namespace gris
 
   /**
   */
-  void XmlAttribute::setName(const char* val)
+  void XmlAttribute::setName(const std::string& val)
   {
-    mAtt->set_name(val);
+    mAtt->set_name(val.c_str());
   }
 
   /**

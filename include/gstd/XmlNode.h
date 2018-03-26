@@ -40,24 +40,24 @@ namespace gris
       pugi::xml_node* getNode();
 
     public:
-      void                 setName(const char* val);
+      void                 setName(const std::string& val);
       const char*          getName() const;
-      void                 setValue(const char* val);
+      void                 setValue(const std::string& val);
       const char*          getValue() const;
-      XmlAttribute         getAttribute(const char* name) const;
+      XmlAttribute         getAttribute(const std::string& name) const;
 
     public:
       std::vector<XmlNode> getChildren() const;
-      XmlNode              getChild    (const char* name) const;
-      bool                 hasChild    (const char* name) const;
+      XmlNode              getChild    (const std::string& name) const;
+      bool                 hasChild    (const std::string& name) const;
       void                 addChild    (const XmlNode& node);
-      XmlNode              addChild    (const char* name);
-      void                 addAttribute(const char* name, const char* value="");
-      XmlAttribute         addAttribute(const char* name);
+      XmlNode              addChild    (const std::string& name);
+      void                 addAttribute(const std::string& name, const std::string& value="");
+      XmlAttribute         addAttribute(const std::string& name);
 
     public:
-      std::vector<XmlNode> XPathNodes  (const char* name) const;
-      XmlNode              XPathNode   (const char* name) const;
+      std::vector<XmlNode> XPathNodes  (const std::string& name) const;
+      XmlNode              XPathNode   (const std::string& name) const;
 
     public:
       std::ostream& print(std::ostream& os) const;
