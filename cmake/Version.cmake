@@ -2,4 +2,4 @@
 include(cmake/DefineVersion.cmake)
 
 # actually set the version
-gris_define_version("GrisFramework" 0 5 2 1)
+gris_define_version("GrisFramework" 0 6 0 0)

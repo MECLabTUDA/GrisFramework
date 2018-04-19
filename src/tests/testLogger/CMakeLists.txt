@@ -33,7 +33,7 @@ source_group("Header Files\\private" FILES
 target_link_libraries(${PROJECT_NAME}
 	gstd
 	pugixml
-  LOKI
+	LOKI
 	)
 
 # add version information to output file name
