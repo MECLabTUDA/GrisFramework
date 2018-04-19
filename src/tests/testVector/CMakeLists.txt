@@ -15,7 +15,7 @@ set(Sources
 set(Files
 	)
 
-gris_boost_find_and_fix("1.59" COMPONENTS filesystem unit_test_framework serialization)
+find_package(Boost 1.59.0 COMPONENTS filesystem unit_test_framework serialization)
 
 add_executable(${PROJECT_NAME}
 	${Private_Includes}

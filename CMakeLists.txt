@@ -51,7 +51,7 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_DEBUG_RUNTIME OFF)
 # set(Boost_DEBUG ON)
 
-gris_boost_find_and_fix("1.59")
+find_package(Boost 1.59.0)
 
 set(LOKI_DIR "${SDK_BASEPATH}/loki-0.1.7"  CACHE PATH "LOKI directory")
 find_package(LOKI)

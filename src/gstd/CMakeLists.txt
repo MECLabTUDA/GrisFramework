@@ -59,7 +59,9 @@ endif()
 # configure the resource file
 gris_configure_resource_rc(Resources GrisFramework std ${PROJECT_NAME})
 
-gris_boost_find_and_fix("1.59" COMPONENTS "filesystem")
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+find_package(Boost 1.59.0 COMPONENTS filesystem)
 
 add_library(${PROJECT_NAME} ${GrisFramework_LIBTYPE}
   ${Includes}
@@ -72,6 +74,7 @@ target_include_directories( ${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/>
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
   $<INSTALL_INTERFACE:${GrisFramework_INCLUDE_INSTALL_DIR}>
+  ${Boost_INCLUDE_DIRS}
   )
 
 if(${GrisFramework_USE_JSON})
@@ -91,7 +94,8 @@ target_link_libraries( ${PROJECT_NAME}	PRIVATE
   )
 
 target_link_libraries( ${PROJECT_NAME} PUBLIC 
-  Boost::filesystem
+  #Boost::filesystem
+	${Boost_LIBRARIES}
   )
 
 source_group("Header Files\\private" FILES
