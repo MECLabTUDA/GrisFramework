@@ -5,7 +5,6 @@
 #include "Vector.h"
 
 // rapidjson
-#define RAPIDJSON_HAS_STDSTRING 1
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
@@ -37,6 +36,12 @@ JSONDynamicPropertyParser::JSONDynamicPropertyParser()
   , mPretty(false)
   , mp(std::make_unique<PrivateJsonData>())
 {
+}
+
+JSONDynamicPropertyParser::JSONDynamicPropertyParser(const bool pretty)
+  : JSONDynamicPropertyParser()
+{
+  mPretty = pretty;
 }
 
 JSONDynamicPropertyParser::~JSONDynamicPropertyParser()
@@ -110,7 +115,7 @@ void JSONDynamicPropertyParser::readImpl(DynamicProperty & prop)
     }
     else // the child is missing in the XML, do not change the value
       appendWarning("The Value for the Property `" + trueName + "` " +
-        "was missing in the XML-file.");
+        "was missing in the XML-file `" + filename().string() + "`.");
   }
 }
 
@@ -135,9 +140,9 @@ void JSONDynamicPropertyParser::writeImpl(const DynamicProperty & prop)
     decltype(mp->pCurrentNode) jsonPtr;
     if (Iter == mp->pCurrentNode->MemberEnd())
       jsonPtr = &mp->pCurrentNode->AddMember(
-        rapidjson::Value(trueName, mp->Document.GetAllocator()), 
+        rapidjson::Value(trueName.c_str(), trueName.size(), mp->Document.GetAllocator()), 
         rapidjson::kNullType, 
-        mp->Document.GetAllocator());
+        mp->Document.GetAllocator())[trueName];
     else jsonPtr = &Iter->value;
     if (p->hint() == PropertyDefinition::Float)
     {
@@ -161,8 +166,16 @@ void JSONDynamicPropertyParser::writeImpl(const DynamicProperty & prop)
           jsonPtr->PushBack(std::remove_pointer_t<decltype(jsonPtr)>(vec[i]), 
             mp->Document.GetAllocator());
     }
-    else 
-      Iter->value.SetString(p->getValue(), mp->Document.GetAllocator());
+    else
+    {
+      auto s = p->getValue();
+      jsonPtr->SetString(s.c_str(), s.size(), mp->Document.GetAllocator());
+    }
+    //{ // Print current file to screen
+    //  rapidjson::StringBuffer json;
+    //  mp->pCurrentNode->Accept(rapidjson::Writer<rapidjson::StringBuffer>(json));
+    //  std::cout << trueName << ": " << json.GetString() << std::endl;
+    //}
     mFileChanged = true;
   }
 }
@@ -217,13 +230,13 @@ void JSONDynamicPropertyParser::readFile(const boost::filesystem::path& filename
 
   if (!parseResult)
   {
-    size_t startPos = std::max(size_t(0), parseResult.Offset() - 10);
-    size_t endPos = parseResult.Offset() + 10;
+    size_t startPos = size_t(std::max(int(0), int(parseResult.Offset()) - 25));
+    size_t endPos = parseResult.Offset() + 25;
     ifs.seekg(startPos);
-    char buffer[20];
+    char buffer[50];
     ifs.read(buffer, endPos - startPos);
     std::string strBuffer(buffer);
-    size_t errorPos = startPos - parseResult.Offset();
+    size_t errorPos =  parseResult.Offset()- startPos;
 
     // parsing was not successful, but RapidJSON did not throw an excepNoKey
     throw GSTD_EXCEPTION_FORMAT("JSON parse error: %s (Position: %u, around `%s*%s` at *)",

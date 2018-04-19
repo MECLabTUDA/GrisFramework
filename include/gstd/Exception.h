@@ -11,22 +11,26 @@
 #define EXCEPTION(e, ...) e (__LINE__, __FUNCTION__, __FILE__, __VA_ARGS__)
 #define GSTD_EXCEPTION(...) EXCEPTION(::gris::gstd::Exception, __VA_ARGS__)
 
-#define GSTD_EXCEPTION_STREAM(x) /* requires inclusion of <sstream> */ \
-  [&] { ::std::ostringstream __oss; { __oss << x; } return GSTD_EXCEPTION(__oss.str() ); } ()
-#define GSTD_EXCEPTION_FORMAT(fmt, x) /* requires inclusion of "boost/format.hpp" */ \
+/* requires inclusion of <sstream> */
+#define GSTD_EXCEPTION_STREAM(x)\
+  GSTD_EXCEPTION([&] { ::std::ostringstream __oss; { __oss << x; } return __oss.str(); } ())
+/* requires inclusion of "boost/format.hpp" */
+#define GSTD_EXCEPTION_FORMAT(fmt, x)\
   GSTD_EXCEPTION( (boost::format( fmt ) % x ).str() )
 
 
 // if(!check) instruction (#generated error);
 // e.g. GSTD_ASSERT(1 == 2, throw) will throw an error
 // or   GSTD_ASSERT(1 == 2, return [](void*) { return true; }) will effectively 'return true'
+// or   GSTD_ASSERT(1 == 2, return true; ) does the same, but produces 'unclean' code
 #define GSTD_ASSERT(check, instruction) \
 if (! check ) { \
   instruction (GSTD_EXCEPTION_STREAM("The assertion '" << #check << "' failed."));\
 }
 // if(variable == nulltpr) instruction (#generated error);
-// e.g. GSTD_ASSERT(ptr, throw) will throw an error
-// or   GSTD_ASSERT(ptr, return [](void*) { return true; }) will effectively 'return true'
+// e.g. GSTD_ASSERT_INIT(ptr, throw) will throw an error
+// or   GSTD_ASSERT_INIT(ptr, return [](void*) { return true; }) will effectively 'return true'
+// or   GSTD_ASSERT_INIT(ptr, return true; ) does the same, but produces 'unclean' code
 #define GSTD_ASSERT_INIT(variable, instruction) \
 if ( variable == nullptr ) { \
     instruction (GSTD_EXCEPTION_STREAM("The variable or return value of '" << #variable << "' is not initialized."));\

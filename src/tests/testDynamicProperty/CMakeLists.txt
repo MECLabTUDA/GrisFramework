@@ -22,7 +22,7 @@ source_group("Header Files\\private" FILES
 	${Private_Includes}
 	)
 	
-gris_boost_find_and_fix("1.59" COMPONENTS filesystem unit_test_framework)
+find_package(Boost 1.59.0 COMPONENTS filesystem unit_test_framework)
 
 add_executable(${PROJECT_NAME}
 	${Private_Includes}

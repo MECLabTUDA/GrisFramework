@@ -18,8 +18,6 @@ set(Sources
 # configure the resource file
 gris_configure_resource_rc(Resources GrisFramework std ${PROJECT_NAME})
 
-#gris_boost_find_and_fix("1.59" COMPONENTS filesystem)
-
 add_library(${PROJECT_NAME} SHARED
 	${Includes}
 	${Private_Includes}
@@ -34,7 +32,6 @@ target_include_directories( ${PROJECT_NAME} PUBLIC
   
 #private includes
 target_link_libraries( ${PROJECT_NAME}	PRIVATE
-#	Boost::filesystem
   )
 	
 source_group("Header Files\\private" FILES

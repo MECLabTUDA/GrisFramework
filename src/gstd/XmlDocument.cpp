@@ -36,13 +36,13 @@ namespace gris
 
   /**
   */
-  std::unique_ptr<XmlDocument> XmlDocument::read(const char* filename)
+  std::unique_ptr<XmlDocument> XmlDocument::read(const std::string& filename)
   {
     path fn(filename);
     if ( ! is_regular_file(fn) )
       throw XmlException(XmlException::FileNotFound);
     std::unique_ptr<XmlDocument> res( new XmlDocument() );
-    pugi::xml_parse_result result = res->mp->doc.load_file(filename);    
+    pugi::xml_parse_result result = res->mp->doc.load_file(filename.c_str());    
     
     if ( ! result)
       throw XmlException(XmlException::InvalidXmlDocument);    
@@ -51,18 +51,18 @@ namespace gris
 
   /**
   */
-  std::unique_ptr<XmlDocument> XmlDocument::create(const char* rootName)
+  std::unique_ptr<XmlDocument> XmlDocument::create(const std::string& rootName)
   {
     std::unique_ptr<XmlDocument> res( new XmlDocument() );
-    res->mp->doc.append_child(rootName);
+    res->mp->doc.append_child(rootName.c_str());
     return res;
   }
 
   /**
   */
-  void XmlDocument::save(const char* filename, XmlDocument& doc)
+  void XmlDocument::save(const std::string& filename, XmlDocument& doc)
   {
-    bool valid = doc.mp->doc.save_file(filename);
+    bool valid = doc.mp->doc.save_file(filename.c_str());
     if ( ! valid)
       throw XmlException(XmlException::SavingFailed);
   }
@@ -78,8 +78,8 @@ namespace gris
 
   /**
   */
-  void XmlDocument::fromString(const char* string)  
+  void XmlDocument::fromString(const std::string& string)  
   {
-    mp->doc.load_string(string);
+    mp->doc.load_string(string.c_str());
   }
 }

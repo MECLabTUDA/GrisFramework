@@ -23,6 +23,7 @@ namespace gstd
   public:
 
     JSONDynamicPropertyParser();
+    JSONDynamicPropertyParser(const bool pretty);
     ~JSONDynamicPropertyParser();
 
     virtual void flush();

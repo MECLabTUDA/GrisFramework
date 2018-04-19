@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <ostream>
+#include <string>
 
 namespace pugi
 {
@@ -26,10 +27,10 @@ namespace gris
      ~XmlAttribute();
       
     public:
-      void        setValue(const char* val);
+      void        setValue(const std::string& val);
       const char* getValue() const;
 
-      void        setName(const char* val);
+      void        setName(const std::string& val);
       const char* getName() const;
 
     public:

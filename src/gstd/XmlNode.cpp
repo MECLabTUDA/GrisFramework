@@ -94,10 +94,10 @@ namespace gris
 
   /**
   */
-  XmlNode XmlNode::getChild(const char* name) const
+  XmlNode XmlNode::getChild(const std::string& name) const
   {
     XmlNode node;
-    node.mp->node = mp->node.child(name);
+    node.mp->node = mp->node.child(name.c_str());
     if (node.mp->node.empty())
     {
       throw XmlException(XmlException::ChildNotFound, name);
@@ -107,16 +107,16 @@ namespace gris
 
   /**
   */  
-  bool XmlNode::hasChild(const char* name) const
+  bool XmlNode::hasChild(const std::string& name) const
   {
-    return !(mp->node.child(name).empty());
+    return !(mp->node.child(name.c_str()).empty());
   }
 
   /**
   */
-  XmlAttribute XmlNode::getAttribute(const char* name) const
+  XmlAttribute XmlNode::getAttribute(const std::string& name) const
   {
-    XmlAttribute res(&mp->node.attribute(name));
+    XmlAttribute res(&mp->node.attribute(name.c_str()));
     if (res.mAtt->empty())
     {
       throw XmlException(XmlException::AttributeNotFound, name);
@@ -133,25 +133,25 @@ namespace gris
 
   /**
   */
-  XmlNode XmlNode::addChild(const char* name)
+  XmlNode XmlNode::addChild(const std::string& name)
   {
     XmlNode res;
-    res.mp->node = mp->node.append_child(name);
+    res.mp->node = mp->node.append_child(name.c_str());
     return res;
   }
 
   /**
   */
-  void XmlNode::setValue(const char* val)
+  void XmlNode::setValue(const std::string& val)
   {
-    mp->node.text().set(val);
+    mp->node.text().set(val.c_str());
   }
 
   /**
   */
-  void XmlNode::setName(const char* val)
+  void XmlNode::setName(const std::string& val)
   {
-    if (mp->node.set_name(val))
+    if (mp->node.set_name(val.c_str()))
     {
       mp->name = val;
     }
@@ -173,29 +173,29 @@ namespace gris
   
   /**
   */
-  void XmlNode::addAttribute(const char* name, const char* value)
+  void XmlNode::addAttribute(const std::string& name, const std::string& value)
   {    
     pugi::xml_attribute att;
-    att.set_name(name);
-    att.set_value(value);
+    att.set_name(name.c_str());
+    att.set_value(value.c_str());
     mp->node.append_copy(att);
     //mp->node.append_attribute(att);
   }
 
   /**
   */
-  XmlAttribute XmlNode::addAttribute(const char* name)
+  XmlAttribute XmlNode::addAttribute(const std::string& name)
   {    
-    pugi::xml_attribute att = mp->node.append_attribute(name);
+    pugi::xml_attribute att = mp->node.append_attribute(name.c_str());
     return XmlAttribute (&att);    
   }
 
-  std::vector<XmlNode> XmlNode::XPathNodes(const char * query) const
+  std::vector<XmlNode> XmlNode::XPathNodes(const std::string& query) const
   {
     std::vector<XmlNode> result;
     pugi::xpath_node_set nodes;
     try {
-       nodes = mp->node.select_nodes(query);
+       nodes = mp->node.select_nodes(query.c_str());
     }
     catch (const pugi::xpath_exception& e)
     {
@@ -210,11 +210,11 @@ namespace gris
     return std::vector<XmlNode>();
   }
 
-  XmlNode XmlNode::XPathNode(const char * query) const
+  XmlNode XmlNode::XPathNode(const std::string& query) const
   {
     XmlNode node;
     try {
-      node.mp->node = mp->node.select_node(query).node();
+      node.mp->node = mp->node.select_node(query.c_str()).node();
     } 
     catch (const pugi::xpath_exception& e)
     {

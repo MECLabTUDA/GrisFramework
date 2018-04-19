@@ -58,6 +58,8 @@ namespace gris
       void flush();
               
     public:
+      void setFileLogging(bool b);
+      void setCoutLogging(bool b) { mUseCout = b; }
       //void add_ostream(std::shared_ptr<std::ostream> pOut);
       //void remove_ostream(std::shared_ptr<std::ostream> pOut);
       void addStream(std::ostream* pOut);
@@ -66,12 +68,19 @@ namespace gris
       void addCallback(LoggerCallback* cb);
       void removeCallback(LoggerCallback* cb);
 
+    public:
+      void                setFilename(const std::string& fn);
+      const std::string&  getFilename()                       const { return mFilename; }
+
     private:
       //std::vector<std::shared_ptr<std::ostream>> mpStreams;
       std::vector<std::ostream*> mpStreams;
       std::vector<LoggerCallback*> mpCallbacks;
       std::ofstream mOfs;
       std::stringstream mBuffer;
+      bool mUseLogFile;
+      bool mUseCout;
+      std::string mFilename;
   };
 
   GRIS_GSTD_API Logger& GetGrisLogger();
@@ -80,8 +89,6 @@ namespace gris
   #define LOG_LINE  gris::GetGrisLogger() = LOG
   #define TLOG      gris::GetGrisLogger().printTimeStamp() << ": "
   #define TLOG_LINE gris::GetGrisLogger() = TLOG
-  #define THE_GRIS_LOGGER gris::GetGrisLogger()
-  
 }
 
 

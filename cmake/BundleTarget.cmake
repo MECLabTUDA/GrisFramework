@@ -44,7 +44,7 @@ function(gris_bundle target)
   if(_DEPLOY_DIRECTORY)
     # add file to apllication file definition
     set_property(TARGET BUNDLE APPEND_STRING PROPERTY APPLICATION_FILE_DEFINITIONS "\nset(${target}_file \"${deploy_dir}$<TARGET_FILE_NAME:${target}>\")")
-    gris_bundle_add_lookup_directories(${deploy_dir})
+    #gris_bundle_add_lookup_directories(${deploy_dir})
     # clean the main deployment directory
     _gris_add_clean_directory("${deploy_dir}" "${install_dir}")
     
@@ -179,7 +179,7 @@ function(gris_bundle_add_library lib)
     # if target is deployed via gris_deploy, use the 'deployed' version
     if(_DEPLOY_DIRECTORY)
       get_property(_MAIN_DEPLOY_SUBDIRECTORY TARGET ${lib} PROPERTY MAIN_DEPLOY_SUBDIRECTORY)
-      IF(DEFINED target AND TARGET ${target})
+      IF(DEFINED ${target} AND TARGET ${target})
         get_property(tgt_DEPLOY_DIRECTORY TARGET ${target} PROPERTY DEPLOY_DIRECTORY)
         get_property(tgt_MAIN_DEPLOY_SUBDIRECTORY TARGET ${target} PROPERTY MAIN_DEPLOY_SUBDIRECTORY)
         IF(tgt_DEPLOY_DIRECTORY AND NOT "${tgt_DEPLOY_DIRECTORY}${tgt_MAIN_DEPLOY_SUBDIRECTORY}" STREQUAL "${_DEPLOY_DIRECTORY}${_MAIN_DEPLOY_SUBDIRECTORY}")

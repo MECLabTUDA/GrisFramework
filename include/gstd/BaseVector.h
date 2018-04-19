@@ -19,6 +19,9 @@ namespace gris
       template<typename = std::enable_if_t<DIM == 3>>
       BaseVector<T, DIM>(T x, T y, T z)   { coeff[0] = x; coeff[1] = y; coeff[2] = z; }
       
+      template<typename T_>
+      BaseVector<T, DIM>(const BaseVector<T_, DIM>& other) { for (size_t i(0); i<DIM; ++i) coeff[i] = (T)other[i]; }
+
     public:
       T&        operator[](std::size_t idx)       { return coeff[idx]; }
       const T&  operator[](std::size_t idx) const { return coeff[idx]; }
