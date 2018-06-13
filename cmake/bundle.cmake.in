@@ -15,6 +15,8 @@ foreach(app IN LISTS ApplicationList)
   fixup_bundle("${${app}_file}" "${${app}_dynamic_libs}" "${LookupDirectories}")
   get_filename_component(TARGET_DIRECTORY "${${app}_file}" PATH)
   get_bundle_and_executable("${${app}_file}" bundle executable valid)
+
+  # copy pdbs, if they exist
   IF(valid)
     get_bundle_keys("${${app}_file}" "${${app}_dynamic_libs}" "${LookupDirectories}" keys)
     FOREACH(key ${keys})

@@ -31,7 +31,7 @@ function(_gris_boost_fix_map_imported_config)
   endif()
 endfunction()
 
-function(gris_boost_find_and_fix)
+macro(gris_boost_find_and_fix)
 # gris_boost_find_and_fix() calls find_package("Boost" ${ARGN}) and follows that up with a call to 
 # fix the mapped import configs (that is using minsizerel and relwithdebinfo). Imported Boost Library
 # Targets are also provided in the Variable BOOST_LIBRARIES. (internal Boost dependencies are not resolved 
@@ -63,5 +63,5 @@ function(gris_boost_find_and_fix)
   _gris_boost_fix_map_imported_config(${_complist})
   set(_complist ${BOOST_LIBRARIES} ${_complist})
   list(REMOVE_DUPLICATES _complist)
-  set(BOOST_LIBRARIES ${_complist} PARENT_SCOPE)
-endfunction()
+  set(BOOST_LIBRARIES ${_complist})
+endmacro()
