@@ -25,6 +25,14 @@ namespace gris
 
     // ------ functions for natural/integer scalars ------ //    
     public:
+      Vector<T, S, DIM> operator-() const
+      {
+        Vector<T, S, DIM> res;
+        for(size_t i(0); i<DIM; ++i)
+          res.coeff[i] = -coeff[i];
+        return res;
+      }
+
       Vector<T, S, DIM>& operator+=(const Vector<T, S, DIM>& rhs)
       {
         for(size_t i(0); i<DIM; ++i)
