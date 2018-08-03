@@ -24,9 +24,10 @@ add_library(${PROJECT_NAME} SHARED
 	${Sources}
 	${Resources}
 	)
+
 # public includes
 target_include_directories( ${PROJECT_NAME} PUBLIC
-	$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}/>
   $<INSTALL_INTERFACE:${GrisFramework_INCLUDE_INSTALL_DIR}>
   )
   

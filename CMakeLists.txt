@@ -43,15 +43,12 @@ option(BUILD_Testing "enable tests" OFF)
 
 OPTION(GrisFramework_USE_JSON "enable JSON interfaces" OFF)
 
-set(Boost_NO_BOOST_CMAKE ON)
+set(Boost_NO_BOOST_CMAKE ON) # no system BoostConfig.cmake
 set(BOOST_ROOT "${SDK_BASEPATH}/boost_1_59_0" CACHE PATH "Boost root directory")
-set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib32-msvc-14.0"  CACHE PATH "Boost library directory")
+set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib64-msvc-14.0" CACHE PATH "Boost library directory")
 mark_as_advanced(BOOST_LIBRARYDIR)
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_DEBUG_RUNTIME OFF)
-# set(Boost_DEBUG ON)
 
-find_package(Boost 1.59.0)
+find_package(Boost 1.59.0 COMPONENTS filesystem unit_test_framework serialization)
 
 set(LOKI_DIR "${SDK_BASEPATH}/loki-0.1.7"  CACHE PATH "LOKI directory")
 find_package(LOKI)

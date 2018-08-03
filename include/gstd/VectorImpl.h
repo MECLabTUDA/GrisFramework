@@ -25,6 +25,15 @@ namespace gris
 
     // ------ functions for natural/integer scalars ------ //    
     public:
+      template<typename = std::enable_if_t<std::is_signed<T>::value>>
+      Vector<T, S, DIM> operator-() const
+      {
+        Vector<T, S, DIM> res;
+        for(size_t i(0); i<DIM; ++i)
+          res.coeff[i] = -coeff[i];
+        return res;
+      }
+
       Vector<T, S, DIM>& operator+=(const Vector<T, S, DIM>& rhs)
       {
         for(size_t i(0); i<DIM; ++i)
@@ -59,7 +68,8 @@ namespace gris
         return *this;
       }
 
-      template<typename Scalar>
+      // avoid ambiguous overloads if a custom class "Foo" specifies operator*(Foo, Vector) or operator*(Vector, Foo)
+      template<typename Scalar, typename = std::enable_if_t<std::is_fundamental<Scalar>::value> >
       friend Vector<T, S, DIM> operator*(Vector<T, S, DIM> q, Scalar val)
       {  
         for(size_t i(0); i<DIM; ++i)
@@ -67,7 +77,7 @@ namespace gris
         return q;
       }
 
-      template<typename Scalar>
+      template<typename Scalar, typename = std::enable_if_t<std::is_fundamental<Scalar>::value> >
       friend Vector<T, S, DIM> operator*(Scalar val, Vector<T, S, DIM> q)
       {
         for(size_t i(0); i<DIM; ++i)

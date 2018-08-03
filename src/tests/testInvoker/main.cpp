@@ -1,8 +1,10 @@
-#define BOOST_TEST_MODULE test
-#include <boost/test/included/unit_test.hpp>
-
 #include "tests.h"
 #include "testInvoker.h"
+
+#define BOOST_TEST_MODULE test
+#include <boost/test/unit_test.hpp>
+
+#include <iostream>
 
 //____________________________________________________________________________//
 
