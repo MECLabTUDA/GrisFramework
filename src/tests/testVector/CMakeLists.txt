@@ -15,8 +15,6 @@ set(Sources
 set(Files
 	)
 
-find_package(Boost 1.59.0 COMPONENTS filesystem unit_test_framework serialization)
-
 add_executable(${PROJECT_NAME}
 	${Private_Includes}
 	${Includes}
@@ -31,6 +29,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	
 target_link_libraries(${PROJECT_NAME}
 	gstd
+	Boost::dynamic_linking
 	Boost::unit_test_framework
 	Boost::serialization
 	)

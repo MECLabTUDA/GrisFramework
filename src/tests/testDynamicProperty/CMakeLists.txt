@@ -21,8 +21,6 @@ set(Sources
 source_group("Header Files\\private" FILES
 	${Private_Includes}
 	)
-	
-find_package(Boost 1.59.0 COMPONENTS filesystem unit_test_framework)
 
 add_executable(${PROJECT_NAME}
 	${Private_Includes}
@@ -37,6 +35,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	
 target_link_libraries(${PROJECT_NAME}
 	gstd
+	Boost::dynamic_linking
 	Boost::filesystem
 	Boost::unit_test_framework
 	)
