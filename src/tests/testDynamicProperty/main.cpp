@@ -1,14 +1,15 @@
 #include "private/test.pch"
-#define BOOST_TEST_MODULE test
-#include <boost/test/included/unit_test.hpp>
-#include <iostream>
 
 #include "tests.h"
 #include "testDynamicPropertyManager.h"
 
+#define BOOST_TEST_MODULE test
+#include <boost/test/unit_test.hpp>
+#include <iostream>
 //____________________________________________________________________________//
 
-struct MyConfig {
+struct MyConfig 
+{
   MyConfig()   { std::cout << "start test suite \n"; }
   ~MyConfig()  { std::cout << "end test suite\n"; }
 };
