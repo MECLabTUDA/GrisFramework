@@ -1,4 +1,5 @@
 #include "XmlDocument.h"
+#include "Exception.h"
 
 #include <pugixml.hpp>
 
@@ -11,6 +12,15 @@ using namespace boost::filesystem;
 
 namespace gris
 {
+  /**
+  */
+  const char* XmlDocument::ErrorStrings[N_Items] =
+  {
+    "Not a valid XML document",
+    "File not found",
+    "Saving failed",
+  };
+
   /**
   */
   struct XmlDocument::Impl 
@@ -40,12 +50,12 @@ namespace gris
   {
     path fn(filename);
     if ( ! is_regular_file(fn) )
-      throw XmlException(XmlException::FileNotFound);
+      throw GSTD_EXCEPTION(ErrorStrings[enFileNotFound]);
     std::unique_ptr<XmlDocument> res( new XmlDocument() );
     pugi::xml_parse_result result = res->mp->doc.load_file(filename.c_str());    
     
     if ( ! result)
-      throw XmlException(XmlException::InvalidXmlDocument);    
+      throw GSTD_EXCEPTION(ErrorStrings[enInvalidXmlDocument]);
     return res;
   }
 
@@ -64,7 +74,7 @@ namespace gris
   {
     bool valid = doc.mp->doc.save_file(filename.c_str());
     if ( ! valid)
-      throw XmlException(XmlException::SavingFailed);
+      throw GSTD_EXCEPTION(ErrorStrings[enSavingFailed]);
   }
 
   /**
