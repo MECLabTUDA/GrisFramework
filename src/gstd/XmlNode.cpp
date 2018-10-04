@@ -1,14 +1,22 @@
 #include "XmlNode.h"
+#include "Exception.h"
 
 #include <pugixml.hpp>
 
 #include <iostream>
-
+#include <sstream>
 
 using namespace std;
 
 namespace gris
 {
+  const char* XmlNode::ErrorStrings[N_Items] = 
+  {
+    "Child not found",
+    "Attribute not found",
+    "XPath not found",
+    "XPath invalid",
+  };
 
   struct XmlNode::Impl
   {
@@ -100,7 +108,9 @@ namespace gris
     node.mp->node = mp->node.child(name.c_str());
     if (node.mp->node.empty())
     {
-      throw XmlException(XmlException::ChildNotFound, name);
+      std::stringstream ss;
+      ss << ErrorStrings[enChildNotFound] << ": " << name;
+      throw GSTD_EXCEPTION(ss.str());
     }
     return node;
   }
@@ -119,7 +129,9 @@ namespace gris
     XmlAttribute res(&mp->node.attribute(name.c_str()));
     if (res.mAtt->empty())
     {
-      throw XmlException(XmlException::AttributeNotFound, name);
+      std::stringstream ss;
+      ss << ErrorStrings[enAttributeNotFound] << ": " << name;
+      throw GSTD_EXCEPTION(ss.str());
     }
     return res;
   }
@@ -199,7 +211,9 @@ namespace gris
     }
     catch (const pugi::xpath_exception& e)
     {
-      throw XmlException(XmlException::XPathInvalid, e.what());
+      std::stringstream ss;
+      ss << ErrorStrings[enXPathInvalid] << ": " << e.what();
+      throw GSTD_EXCEPTION(ss.str());
     }
     for (auto it = nodes.begin(); it != nodes.end(); ++it)
     {
@@ -218,11 +232,15 @@ namespace gris
     } 
     catch (const pugi::xpath_exception& e)
     {
-      throw XmlException(XmlException::XPathInvalid, e.what());
+      std::stringstream ss;
+      ss << ErrorStrings[enXPathInvalid] << ": " << e.what();
+      throw GSTD_EXCEPTION(ss.str());
     }
     if (node.mp->node.empty())
     {
-      throw XmlException(XmlException::XPathNotFound, query);
+      std::stringstream ss;
+      ss << ErrorStrings[enXPathNotFound] << ": " << query;
+      throw GSTD_EXCEPTION(ss.str());
     }
     return node;
   }
@@ -241,12 +259,4 @@ namespace gris
   {
     return node.print(os);
   }
-
-  /**
-  */
-  char const* XmlException::what() const 
-  {
-    return std::string(mStr).append(": ").append(mInfo).c_str();
-  }
-
 }

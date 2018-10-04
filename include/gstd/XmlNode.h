@@ -63,62 +63,23 @@ namespace gris
       std::ostream& print(std::ostream& os) const;
 
     private:
+      enum EnErrorTypes
+      {
+        enChildNotFound = 0,
+        enAttributeNotFound,
+        enXPathNotFound,
+        enXPathInvalid,
+        N_Items
+      };
+
+      static const char* ErrorStrings[N_Items];
+
+    private:
       struct Impl;
       std::unique_ptr<Impl> mp;
   };
 
   GRIS_GSTD_API std::ostream& operator<<(std::ostream& os, const XmlNode& node);
-
-  class GRIS_GSTD_API XmlException : public std::exception
-  {
-    public:
-      enum EnType
-      {
-        InvalidXmlDocument,
-        FileNotFound,
-        ChildNotFound,
-        AttributeNotFound,
-        SavingFailed,
-        XPathNotFound,
-        XPathInvalid,
-        N_Items
-      };
-
-      const char* Strings[N_Items] = 
-      {
-        "Not a valid XML document",
-        "File not found",
-        "Child not found",
-        "Attribute not found",
-        "XPath not found",
-        "XPath invalid",
-        "Saving failed"
-      };
-
-    public:
-      explicit XmlException(EnType type)
-      {
-        mType = type;
-        mStr = Strings[mType];
-      }
-
-      explicit XmlException(EnType type, const std::string& info)
-      {
-        mType = type;
-        mStr = Strings[mType];
-        mInfo = info;
-      }
-
-      void addInfo(const std::string& str) { mInfo = str; }
-
-      virtual char const* what() const;
-
-    private:
-      EnType mType;
-      std::string mStr;
-      std::string mInfo;
-  };
-
 }
 
 #pragma warning (pop)

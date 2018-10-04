@@ -30,8 +30,18 @@ namespace gris
 
     public:
       XmlNode getRoot();
-
       void fromString(const std::string& string);
+
+    private:
+      enum EnErrorTypes
+      {
+        enInvalidXmlDocument = 0,
+        enFileNotFound,
+        enSavingFailed,
+        N_Items
+      };
+
+      static const char* ErrorStrings[N_Items];
 
     private:
       struct Impl;
