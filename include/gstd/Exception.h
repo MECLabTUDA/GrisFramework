@@ -40,34 +40,41 @@ namespace gris
 {
 namespace gstd
 {
+  /**
+  */
   class GRIS_GSTD_API Exception : public std::exception
   {
-  public:
-    Exception(const unsigned int line, const std::string& function, const std::string& file, const std::string& message );
-    Exception(const Exception& other);
+    public:
+      explicit Exception(const std::string& message);
+      Exception(const unsigned int line, const std::string& function, const std::string& file, const std::string& message );
+      Exception(const Exception& other);
+      Exception& operator=(const Exception& other);
 
-  public:
-    virtual const char* what() const;
+    public:
+      static std::string indent(const std::string& text);
 
-    const std::string&           message()  const   { return mMessage; }
-    unsigned int                 line()     const   { return mLine; }
-    const char*                  function() const   { return mFunction.c_str(); }
-    const char*                  file()     const   { return mFilename.c_str(); }
+    public:
+      virtual const char* what() const;
 
-    void                         prepend(const std::string& s);
-    void                         append(const std::string& s);
+    public:
+      const std::string&           message()  const   { return mMessage; }
+      unsigned int                 line()     const   { return mLine; }
+      const char*                  function() const   { return mFunction.c_str(); }
+      const char*                  file()     const   { return mFilename.c_str(); }
 
-    void                         reformatString();
+      void                         prepend(const std::string& s);
+      void                         append(const std::string& s);
 
-  public:
-    static std::string indent(const std::string& text);
-  private:
-    std::string mFilename;
-    std::string mMessage;
-    std::string mFunction;
-    unsigned int mLine;
+    protected:
+      void                         reformatString();
 
-    std::string mFormattedMessage;
+    private:
+      std::string mFilename;
+      std::string mMessage;
+      std::string mFunction;
+      unsigned int mLine;
+
+      std::string mFormattedMessage;
   };
 }
 }

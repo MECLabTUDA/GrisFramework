@@ -6,24 +6,41 @@ namespace gris
 {
 namespace gstd
 {
+  Exception::Exception(const std::string& message)
+    : mMessage(message)
+  {
+    reformatString();
+  }
+
   Exception::Exception(const unsigned int line, const std::string & function, const std::string & file, const std::string & message)
     : mLine(line)
     , mFilename(file)
     , mFunction(function)
     , mMessage(message)
-    , std::exception()
   {
     reformatString();
   }
 
-  Exception::Exception(const Exception & other)
-    : std::exception()
-    , mLine(other.mLine)
-    , mFunction(other.mFunction)
-    , mFilename(other.mFilename)
-    , mMessage(other.mMessage)
-    , mFormattedMessage(other.mFormattedMessage)
+  Exception::Exception(const Exception & o)
+    : mLine(o.mLine)
+    , mFunction(o.mFunction)
+    , mFilename(o.mFilename)
+    , mMessage(o.mMessage)
+    , mFormattedMessage(o.mFormattedMessage)
   {
+  }
+
+  Exception& Exception::operator=(const Exception& o)
+  {
+    if (this != &o)
+    {
+      mLine = o.mLine;
+      mFunction = o.mFunction;
+      mFilename = o.mFilename;
+      mMessage = o.mMessage;
+      mFormattedMessage = o.mFormattedMessage;
+    }
+    return *this;
   }
 
   const char * Exception::what() const
@@ -46,7 +63,9 @@ namespace gstd
   void Exception::reformatString()
   {
     std::ostringstream oss;
-    oss << mFilename << ":" << mLine << " [" << mFunction << "]:" << std::endl << indent(mMessage) << std::endl;
+    if ( ! mFilename.empty())
+      oss << mFilename << ":" << mLine << " ";
+    oss << "[" << mFunction << "]:" << std::endl << indent(mMessage) << std::endl;
     mFormattedMessage = oss.str();
   }
 
