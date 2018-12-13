@@ -26,50 +26,49 @@ namespace gris
 namespace test
 {
 
-/** \brief Writes and reads a simple xml document and compares two child values
-*/
-void basicReadWrite()
-{
-  using namespace std;
-
+  /** \brief Writes and reads a simple xml document and compares two child values
+  */
+  void basicReadWrite()
   {
-    auto doc = XmlDocument::create(root.c_str());
-    auto root = doc->getRoot();
-    root.addChild(child1.c_str()).setValue(text1.c_str());
-    root.addChild(child2.c_str()).setValue(text2.c_str());
-    XmlDocument::save(fn.c_str(), *doc);
+    using namespace std;
+    {
+      auto doc = XmlDocument::create(root.c_str());
+      auto root = doc->getRoot();
+      root.addChild(child1.c_str()).setValue(text1.c_str());
+      root.addChild(child2.c_str()).setValue(text2.c_str());
+      XmlDocument::save(fn.c_str(), *doc);
+    }
+    {
+      auto doc = XmlDocument::read(fn.c_str());
+      auto root = doc->getRoot();
+      auto v1 = root.getChild(child1.c_str()).getValue();
+      auto v2 = root.getChild(child2.c_str()).getValue();
+      BOOST_CHECK_EQUAL(text1, v1);
+      BOOST_CHECK_EQUAL(text2, v2);
+    }
+    {
+      /*auto doc = XmlDocument::read("testReadXml.xml");
+      auto root = XmlNode(doc->getRoot());
+      auto att = root.getChild("ApplicationSettings").getAttribute("option_a");
+      std::cout << att << endl;
+      root.getChild("ApplicationSettings").getAttribute("option_a").setValue("blubb");
+      std::cout << att << endl;
+      XmlDocument::save("testSaveXml.xml", *doc);*/
+    }
   }
+
+  /** \brief Todo test setting/cahnging/reading attributes
+  */
+  void testAttributes()
   {
-    auto doc = XmlDocument::read(fn.c_str());
-    auto root = doc->getRoot();
-    auto v1 = root.getChild(child1.c_str()).getValue();
-    auto v2 = root.getChild(child2.c_str()).getValue();
-    BOOST_CHECK_EQUAL(text1, v1);
-    BOOST_CHECK_EQUAL(text2, v2);
   }
+
+  /** \brief Test if changing of values works
+
+    adresses B#8047
+  */
+  void testSetValue()
   {
-    /*auto doc = XmlDocument::read("testReadXml.xml");
-    auto root = XmlNode(doc->getRoot());
-    auto att = root.getChild("ApplicationSettings").getAttribute("option_a");
-    std::cout << att << endl;
-    root.getChild("ApplicationSettings").getAttribute("option_a").setValue("blubb");
-    std::cout << att << endl;
-    XmlDocument::save("testSaveXml.xml", *doc);*/
-  }
-}
-
-/** \brief Todo test setting/cahnging/reading attributes
-*/
-void testAttributes()
-{
-}
-
-/** \brief Test if changing of values works
-
-  adresses B#8047
-*/
-void testSetValue()
-{
   try
   {
     // build basic document
@@ -103,7 +102,25 @@ void testSetValue()
     std::cout << e.what() << std::endl;
     throw e;
   }
-}
+  }
 
+  /**
+  */
+  void testRemoveChildren()
+  {
+    auto doc = XmlDocument::create(root.c_str());
+    auto node = doc->getRoot();
+    node.addChild(text1);
+    node.addChild(text2);
+    BOOST_CHECK_EQUAL(2, node.getChildren().size());
+    node.removeChild(text1);
+    BOOST_CHECK( ! node.hasChild(text1));
+    BOOST_CHECK(node.hasChild(text2));
+    node.addChild(text1);
+    BOOST_CHECK(node.hasChild(text1));
+    BOOST_CHECK(node.hasChild(text2));
+    node.removeChildren();
+    BOOST_CHECK_EQUAL(0, node.getChildren().size());
+  }
 }
 }

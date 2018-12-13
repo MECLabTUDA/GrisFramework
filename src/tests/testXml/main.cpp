@@ -22,4 +22,5 @@ BOOST_AUTO_TEST_CASE( test_case )
   BOOST_CHECK_NO_THROW(gris::test::basicReadWrite());
   BOOST_CHECK_NO_THROW(gris::test::testAttributes());
   BOOST_CHECK_NO_THROW(gris::test::testSetValue());
+  BOOST_CHECK_NO_THROW(gris::test::testRemoveChildren());
 }

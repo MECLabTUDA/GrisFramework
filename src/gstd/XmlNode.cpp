@@ -206,7 +206,8 @@ namespace gris
   {
     std::vector<XmlNode> result;
     pugi::xpath_node_set nodes;
-    try {
+    try 
+    {
        nodes = mp->node.select_nodes(query.c_str());
     }
     catch (const pugi::xpath_exception& e)
@@ -227,7 +228,8 @@ namespace gris
   XmlNode XmlNode::XPathNode(const std::string& query) const
   {
     XmlNode node;
-    try {
+    try 
+    {
       node.mp->node = mp->node.select_node(query.c_str()).node();
     } 
     catch (const pugi::xpath_exception& e)
@@ -243,6 +245,31 @@ namespace gris
       throw GSTD_EXCEPTION(ss.str());
     }
     return node;
+  }
+
+  /**
+  */
+  void XmlNode::removeChild(const std::string& name)
+  {
+    if ( ! hasChild(name))
+      return;
+    mp->node.remove_child(name.c_str());
+  }
+
+  /**
+  */
+  void XmlNode::removeChildren()
+  {
+    const auto nodes = mp->node.children();
+    std::vector<std::string> names;
+    for (auto it = nodes.begin(); it != nodes.end(); ++it)
+    {
+      names.push_back(std::string(it->name()));
+    }
+    for (const auto& name : names) 
+    {
+      mp->node.remove_child(name.c_str());
+    }
   }
 
   /**

@@ -7,5 +7,6 @@ namespace gris
     void basicReadWrite();
     void testAttributes();
     void testSetValue();
+    void testRemoveChildren();
   }
 }

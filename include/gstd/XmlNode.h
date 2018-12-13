@@ -52,6 +52,8 @@ namespace gris
       bool                 hasChild    (const std::string& name) const;
       void                 addChild    (const XmlNode& node);
       XmlNode              addChild    (const std::string& name);
+      void                 removeChild (const std::string& name);
+      void                 removeChildren();
       void                 addAttribute(const std::string& name, const std::string& value="");
       XmlAttribute         addAttribute(const std::string& name);
 

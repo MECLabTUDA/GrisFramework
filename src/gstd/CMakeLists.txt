@@ -25,7 +25,6 @@ set(Includes
   ${INC_DIR}gstd_api.h
   )
 set(Private_Includes
-  ${INC_DIR}private/targetver.h
   )	
 set(Sources	
   DynamicProperty.cpp
